@@ -9,23 +9,43 @@
   width: 100%;
 }
 
-table {
+table.board {
   background: rgb(196, 120, 69);
-  color: black;
+  color: rgb(32, 20, 11);
   width: 704px;
   margin: 0 10%;
   border-collapse: collapse;
 }
 
-th {
+table.board th {
   background: moccasin;
 }
-td {
+
+table.board td {
   width: 80px;
   height: 80px;
-  font-size: 32pt;
+  font-size: 40pt;
 }
 
-tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
+table.board td.piece {
+  cursor: pointer;
+}
+
+table.board tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
 	background: moccasin;
+}
+
+table.board td.piece:hover {
+  background: rgb(223, 150, 101);
+  /**text-shadow: 1px 1px 2px #888;*/
+  font-size: 48pt;
+}
+
+table.board tr:nth-child(odd) td.piece:nth-child(even):hover, tr:nth-child(even) td.piece:nth-child(odd):hover {
+	background: rgb(252, 232, 198);
+}
+
+table.board td.piece.selected {
+  font-size: 48pt;
+  color: rgb(20, 13, 7);
 }

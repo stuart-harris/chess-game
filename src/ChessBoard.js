@@ -20,6 +20,7 @@ const BLACK_ROOK = { piece: PIECE_ROOK, text: "&#x265C;", side: BLACK_SIDE};
 const BLACK_PAWN = { piece: PIECE_PAWN, text: "&#x265F;", side: BLACK_SIDE};
 export default (state = 
   {
+    selected: "",
     pieces: [
       { piece: WHITE_ROOK, location: "a1"},
       { piece: WHITE_KNIGHT, location: "b1"},
@@ -57,6 +58,8 @@ export default (state =
   }, action) => {
   switch (action.type) {
     case 'MOVE':
+      break;
+    case 'SELECT':
       break;
     default:
       return state;

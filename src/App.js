@@ -6,6 +6,12 @@ class App extends Component {
     super(props);
   }
 
+  selectPiece(r, c) {
+
+    var locn = this.makeLocation(r, c);
+    console.log('selectPiece(' + r + ', ' + c + '): ' + locn);
+    // TODO: Use redux to dispatch a call to select a piece
+  }
   // if r=2, c=3, returns d3 (c=3=>d, r=2=>3 1 based)
   makeLocation(r, c) {
     const aVal = "a".charCodeAt(0);
@@ -44,13 +50,18 @@ class App extends Component {
     const { value, onMove } = this.props;
     const board = this.generateBoard(value.pieces);
 
-    const rows = board.map((row, index) =>
-    <tr key={index}>
+    const rows = board.map((row, r_index) =>
+    <tr key={'row_' + r_index}>
       {
-      row.map((col, c_index) =>
-      <td key={'col_' + c_index}>
-        <span dangerouslySetInnerHTML={{__html: col}}></span>
-      </td>)
+        row.map((col, c_index) =>
+<td
+  key={'col_' + c_index}
+  className={(!col?'':'piece') + ' ' + (this.makeLocation(r_index, c_index) == value.selected, 'selected', '')}
+  onClick={(e) => this.selectPiece(r_index, c_index)}
+  >
+  <span dangerouslySetInnerHTML={{__html: col}}></span>
+</td>
+)
       }
     </tr>
     );
@@ -58,7 +69,7 @@ class App extends Component {
       <div className="App">
       <h1>A Chess Game</h1>
       <section className="center">
-      <table>
+      <table className="board">
         <thead>
           <tr>
           <th>a</th>
