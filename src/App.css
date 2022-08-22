@@ -1,0 +1,31 @@
+.App {
+  text-align: center;
+  padding: 20px;
+  width: 100%;
+}
+
+.center {
+  text-align: center;
+  width: 100%;
+}
+
+table {
+  background: rgb(196, 120, 69);
+  color: black;
+  width: 704px;
+  margin: 0 10%;
+  border-collapse: collapse;
+}
+
+th {
+  background: moccasin;
+}
+td {
+  width: 80px;
+  height: 80px;
+  font-size: 32pt;
+}
+
+tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
+	background: moccasin;
+}
