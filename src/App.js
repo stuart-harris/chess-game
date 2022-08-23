@@ -47,7 +47,7 @@ class App extends Component {
   }
 
   render() {
-    const { value, onMove } = this.props;
+    const { value, onMove, onReset, onClear } = this.props;
     const board = this.generateBoard(value.pieces);
 
     const rows = board.map((row, r_index) =>
@@ -69,6 +69,10 @@ class App extends Component {
       <div className="App">
       <h1>A Chess Game</h1>
       <section className="center">
+        <div>
+          <button id="btn-reset" onClick={onReset}>Reset</button>
+          <button id="btn-clear" onClick={onClear}>Clear</button>
+          </div>
       <table className="board">
         <thead>
           <tr>

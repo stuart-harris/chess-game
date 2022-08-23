@@ -12,6 +12,8 @@ const render = () => ReactDOM.render(
   <App
     value={store.getState()}
     onMove={() => store.dispatch({ type: 'MOVE' })}
+    onReset={() => store.dispatch({ type: 'RESET' })}
+    onClear={() => store.dispatch({ type: 'CLEAR' })}
   />,
   document.getElementById('root')
 );
