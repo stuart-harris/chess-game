@@ -35,6 +35,14 @@ button.btn-primary {
   width: 100%;
 }
 
+.taken {
+  color: rgb(32, 20, 11);
+  font-size: 24px;
+  text-align: left;
+  margin-left: 10%;
+  height: 30px; 
+}
+
 table.board {
   background: rgb(196, 120, 69);
   color: rgb(32, 20, 11);

@@ -45,12 +45,16 @@ class App extends Component {
     return board;
   }
 
+  onClear() {
+    this.setState(this.engine.actions.clear());
+  }
+
   onReset() {
     this.setState(this.engine.actions.reset());
   }
 
-  onClear() {
-    this.setState(this.engine.actions.clear());
+  onStart() {
+    this.setState(this.engine.actions.start());
   }
 
   selectPiece(r, c) {
@@ -93,14 +97,38 @@ class App extends Component {
     </tr>
     );
 
+    const whiteTaken =
+    <div className="taken">
+      {
+    value.pieces
+    .filter(p => p.piece.side === "White" && p.location === "")
+    .map((p, i) =>
+        <span key={i} dangerouslySetInnerHTML={{__html: p.piece.text}}></span>  
+    )
+      }
+      </div>;
+
+    const blackTaken =
+    <div className="taken">
+      {
+    value.pieces
+    .filter(p => p.piece.side === "Black" && p.location === "")
+    .map((p, i) =>
+        <span key={i} dangerouslySetInnerHTML={{__html: p.piece.text}}></span>  
+    )
+      }
+      </div>;
+
     return (
       <div className="App">
       <h1>A Chess Game</h1>
-      <section className="center">
+      <section className="">
         <div className="margin-bottom-m">
-          <button id="btn-reset" className="btn btn-primary" onClick={() => this.onReset()}>Reset</button>
-          <button id="btn-clear" className="btn margin-left-m" onClick={() => this.onClear()}>Clear</button>
+          <button id="btn-clear" className="btn" onClick={() => this.onClear()}>Clear</button>
+          <button id="btn-reset" className="btn margin-left-m" onClick={() => this.onReset()}>Reset</button>
+          <button id="btn-start" className="btn btn-primary margin-left-m" onClick={() => this.onStart()}>Start</button>
         </div>
+      {blackTaken}
       <table className="board">
         <thead>
           <tr>
@@ -130,6 +158,7 @@ class App extends Component {
           </tr>
         </tfoot>
       </table>
+      {whiteTaken}
       </section>
       </div>
       );
