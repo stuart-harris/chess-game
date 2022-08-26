@@ -30,7 +30,7 @@ class App extends Component {
       let p = pieces[i];
       var coord = this.engine.methods.textToLocation(p.location);
       if (!coord) continue;
-      board[coord.row][coord.col] = p.piece.text;
+      board[8-coord.row][coord.col-1] = p.piece.text;
     }
 
     return board;
@@ -48,8 +48,17 @@ class App extends Component {
     this.setState(this.engine.actions.start());
   }
 
+  coordsToBoard(coords) {
+    return { row: 8-coords.row, col: coords.col + 1};
+  }
+
+  coordsToScreen(coords) {
+    return { row: 8-coords.row, col: coords.col - 1};
+  }
+
   selectPiece(r, c) {
-    var locn = this.engine.methods.locationToText(r, c);
+    var bCoords = this.coordsToBoard({row: r, col: c});
+    var locn = this.engine.methods.locationToText(bCoords.row, bCoords.col);
     console.log('selectPiece(' + r + ', ' + c + '): ' + locn);
     // TODO: Use redux to dispatch a call to select a piece
     this.setState(this.engine.actions.selectPiece(locn));
@@ -60,7 +69,8 @@ class App extends Component {
     if (pieceText) {
       result.push('piece');
     }
-    var locn = this.engine.methods.locationToText(r, c);
+    var bCoords = this.coordsToBoard({row: r, col: c});
+    var locn = this.engine.methods.locationToText(bCoords.row, bCoords.col);
 
     if (this.state.selected) {
       result.push(locn === this.state.selected ? 'selected' : 'selectable');
@@ -124,7 +134,7 @@ class App extends Component {
           <button id="btn-reset" className="btn margin-left-m" onClick={() => this.onReset()}>Reset</button>
           <button id="btn-start" className="btn btn-primary margin-left-m" onClick={() => this.onStart()}>Start</button>
         </div>
-      {blackTaken}
+      {whiteTaken}
       <table className="board">
         <thead>
           <tr>
@@ -154,7 +164,7 @@ class App extends Component {
           </tr>
         </tfoot>
       </table>
-      {whiteTaken}
+      {blackTaken}
       </section>
       </div>
       );

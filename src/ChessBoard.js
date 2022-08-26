@@ -93,11 +93,10 @@ function chessBoardEngineFn()
     const aVal = "a".charCodeAt(0);
 
     if (!t || t.length != 2) return;
-    let c = t.charCodeAt(0) - aVal;
-    if (c < 0 || c > 7) return;
+    let c = t.charCodeAt(0) - aVal + 1;
+    if (c < 1 || c > 8) return;
     let r = parseInt(t.charAt(1));
     if (r < 1 || r > 8) return;
-    r -= 1;
     return { row: r, col: c};
   }
 
@@ -107,7 +106,7 @@ function chessBoardEngineFn()
    */
   function locationToText(row, col) {
     const aVal = "a".charCodeAt(0);
-    return String.fromCharCode(aVal + col) + (row+1).toString();
+    return String.fromCharCode(aVal + col - 1) + (row).toString();
 
   }
 
@@ -148,7 +147,7 @@ function chessBoardEngineFn()
   }
 
   function isValidLocation(coord) {
-    return coord.row > -1 && coord.row < 8 && coord.col > -1 && coord.col < 8;
+    return coord.row > 0 && coord.row < 9 && coord.col > 0 && coord.col < 9;
   }
 
   function isEqual(fromCoord, toCoord) {

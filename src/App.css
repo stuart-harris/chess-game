@@ -53,6 +53,7 @@ table.board {
 
 table.board th {
   background: moccasin;
+  font-weight: normal;
 }
 
 table.board td {
@@ -65,7 +66,7 @@ table.board td.piece {
   cursor: pointer;
 }
 
-table.board tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-child(odd) {
+table.board tr:nth-child(even) td:nth-child(even), tr:nth-child(odd) td:nth-child(odd) {
 	background: moccasin;
 }
 
@@ -75,10 +76,10 @@ table.board td.piece:hover, table.board td.selectable:hover {
   box-shadow: 0px 0px 2px 2px #f1a92b;
 }
 
-table.board tr:nth-child(odd) td.piece:nth-child(even):hover,
-table.board tr:nth-child(even) td.piece:nth-child(odd):hover,
-table.board tr:nth-child(odd) td.selectable:nth-child(even):hover,
-table.board tr:nth-child(even) td.selectable:nth-child(odd):hover  {
+table.board tr:nth-child(even) td.piece:nth-child(even):hover,
+table.board tr:nth-child(odd) td.piece:nth-child(odd):hover,
+table.board tr:nth-child(even) td.selectable:nth-child(even):hover,
+table.board tr:nth-child(odd) td.selectable:nth-child(odd):hover  {
 	background: rgb(252, 232, 198);
 }
 
@@ -93,11 +94,11 @@ table.board td.piece.selected {
 }
 
 table.board td.from,
-table.board tr:nth-child(odd) td.from:nth-child(even),
-table.board tr:nth-child(even) td.from:nth-child(odd),
-table.board tr:nth-child(odd) td.from.piece:nth-child(even),
-table.board tr:nth-child(even) td.from.piece:nth-child(odd),
-table.board tr:nth-child(odd) td.from.selectable:nth-child(even),
-table.board tr:nth-child(even) td.from.selectable:nth-child(odd) {
+table.board tr:nth-child(even) td.from:nth-child(even),
+table.board tr:nth-child(odd) td.from:nth-child(odd),
+table.board tr:nth-child(even) td.from.piece:nth-child(even),
+table.board tr:nth-child(odd) td.from.piece:nth-child(odd),
+table.board tr:nth-child(even) td.from.selectable:nth-child(even),
+table.board tr:nth-child(odd) td.from.selectable:nth-child(odd) {
   background: rgb(228, 221, 91);
 }
