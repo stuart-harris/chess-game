@@ -71,7 +71,6 @@ table.board tr:nth-child(odd) td:nth-child(even), tr:nth-child(even) td:nth-chil
 
 table.board td.piece:hover, table.board td.selectable:hover {
   background: rgb(223, 150, 101);
-  /**text-shadow: 1px 1px 2px #888;*/
   font-size: 48pt;
   box-shadow: 0px 0px 2px 2px #f1a92b;
 }
@@ -83,12 +82,22 @@ table.board tr:nth-child(even) td.selectable:nth-child(odd):hover  {
 	background: rgb(252, 232, 198);
 }
 
+table.board td.selectable {
+  cursor: pointer;
+}
+
 table.board td.piece.selected {
   font-size: 48pt;
   color: rgb(20, 13, 7);
   box-shadow: 0px 0px 2px 2px #f1a92b;
 }
 
-table.board td.selectable {
-  cursor: pointer;
+table.board td.from,
+table.board tr:nth-child(odd) td.from:nth-child(even),
+table.board tr:nth-child(even) td.from:nth-child(odd),
+table.board tr:nth-child(odd) td.from.piece:nth-child(even),
+table.board tr:nth-child(even) td.from.piece:nth-child(odd),
+table.board tr:nth-child(odd) td.from.selectable:nth-child(even),
+table.board tr:nth-child(even) td.from.selectable:nth-child(odd) {
+  background: rgb(228, 221, 91);
 }

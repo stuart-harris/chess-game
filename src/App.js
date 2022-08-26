@@ -11,11 +11,6 @@ class App extends Component {
     super(props);
   }
 
-  // if r=2, c=3, returns d3 (c=3=>d, r=2=>3 1 based)
-  makeLocation(r, c) {
-    const aVal = "a".charCodeAt(0);
-    return String.fromCharCode(aVal + c) + (r+1).toString();
-  }
   // generate a 2 x 2 array of string to render on the board
   generateBoard(pieces) {
     var board = [
@@ -33,13 +28,9 @@ class App extends Component {
 
     for(let i = 0; i < pieces.length; i++) {
       let p = pieces[i];
-      if (!p.location || p.location.length != 2) continue;
-      let c = p.location.charCodeAt(0) - aVal;
-      if (c < 0 || c > 7) continue;
-      let r = parseInt(p.location.charAt(1));
-      if (r < 1 || r > 8) continue;
-      r -= 1;
-      board[r][c] = p.piece.text;
+      var coord = this.engine.methods.textToLocation(p.location);
+      if (!coord) continue;
+      board[coord.row][coord.col] = p.piece.text;
     }
 
     return board;
@@ -58,7 +49,7 @@ class App extends Component {
   }
 
   selectPiece(r, c) {
-    var locn = this.makeLocation(r, c);
+    var locn = this.engine.methods.locationToText(r, c);
     console.log('selectPiece(' + r + ', ' + c + '): ' + locn);
     // TODO: Use redux to dispatch a call to select a piece
     this.setState(this.engine.actions.selectPiece(locn));
@@ -69,11 +60,16 @@ class App extends Component {
     if (pieceText) {
       result.push('piece');
     }
-    var locn = this.makeLocation(r, c);
+    var locn = this.engine.methods.locationToText(r, c);
 
     if (this.state.selected) {
       result.push(locn === this.state.selected ? 'selected' : 'selectable');
     }
+
+    if (this.state.fromLocation === locn) {
+      result.push('from');
+    }
+
     return result.join(' ');
   }
 

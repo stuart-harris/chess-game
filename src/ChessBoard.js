@@ -64,6 +64,7 @@ function chessBoardEngineFn()
   var obj = {
     state: {
       selected: "",
+      fromLocation: "",
       pieces: []  
     }
   };
@@ -77,7 +78,38 @@ function chessBoardEngineFn()
     selectPiece: selectPiece.bind(obj)  
   }
 
+  obj.methods = {
+    textToLocation: textToLocation,
+    locationToText: locationToText
+  }
+
   return obj;
+
+  /**
+   * Convert a1 to { row: 0, col: 0 }, a2 to { row: 1, col: 0 }
+   * @param {*} t text
+   */
+  function textToLocation(t) {
+    const aVal = "a".charCodeAt(0);
+
+    if (!t || t.length != 2) return;
+    let c = t.charCodeAt(0) - aVal;
+    if (c < 0 || c > 7) return;
+    let r = parseInt(t.charAt(1));
+    if (r < 1 || r > 8) return;
+    r -= 1;
+    return { row: r, col: c};
+  }
+
+  /** if r=2, c=3, returns d3 (c=3=>d, r=2=>3 1 based)
+   * row: integer, 0-7
+   * col: integer, 0-7
+   */
+  function locationToText(row, col) {
+    const aVal = "a".charCodeAt(0);
+    return String.fromCharCode(aVal + col) + (row+1).toString();
+
+  }
 
   function cloneState() {
     this.state = Object.assign({}, this.state);
@@ -103,13 +135,92 @@ function chessBoardEngineFn()
     return this.actions.cloneState();
   }
 
+  function isStraight(fromCoord, toCoord) {
+    return fromCoord.row === toCoord.row || fromCoord.col === toCoord.col;
+  }
+
+  function isDiagonal(fromCoord, toCoord) {
+    return Math.abs(fromCoord.row - toCoord.row) === Math.abs(fromCoord.col - toCoord.col);
+  }
+
+  function isStraightOrDiagonal(fromCoord, toCoord) {
+    return isStraight(fromCoord, toCoord) || isDiagonal(fromCoord, toCoord);
+  }
+
+  function isValidLocation(coord) {
+    return coord.row > -1 && coord.row < 8 && coord.col > -1 && coord.col < 8;
+  }
+
+  function isEqual(fromCoord, toCoord) {
+    return fromCoord.row === toCoord.row && fromCoord.col === toCoord.col; 
+  }
+
+  function isOneSquare(fromCoord, toCoord) {
+    return !isEqual(fromCoord, toCoord) &&
+      Math.abs(fromCoord.row - toCoord.row) < 2 &&
+      Math.abs(fromCoord.col - toCoord.col) < 2;
+  }
+
+  function isKnightMove(fromCoord, toCoord) {
+    var vDist = Math.abs(fromCoord.row - toCoord.row);
+    var hDist = Math.abs(fromCoord.col - toCoord.col);
+    return (vDist === 1 && hDist === 2) || (vDist === 2 && hDist === 1);
+  }
+
+  function isPawnMove(hasMoved, fromCoord, toCoord, takenPiece, isWhite) {
+    var dir = isWhite ? 1 : -1;
+    var isForward1 = toCoord.row - fromCoord.row === dir;
+    var isForward2 = toCoord.row - fromCoord.row === dir * 2;
+    var isSameCol = fromCoord.col === toCoord.col;
+    var isSide1 = Math.abs(fromCoord.col - toCoord.col) === 1;
+    return (isSameCol && !takenPiece && (isForward1 || (!hasMoved && isForward2))) ||
+      isSide1 && !!takenPiece && isForward1;
+  }
+
+  function canMove(piece, fromCoord, toCoord, takenPiece) {
+    if (!piece || !piece.piece || !piece.piece.piece) return false;
+    if (!isValidLocation(fromCoord) || !isValidLocation(toCoord)) return false;
+
+    if (piece.piece.piece === PIECE_KING) {
+      return isOneSquare(fromCoord, toCoord);
+    }
+    if (piece.piece.piece === PIECE_QUEEN) {
+      return isStraightOrDiagonal(fromCoord, toCoord);
+    }
+    if (piece.piece.piece === PIECE_BISHOP) {
+      return isDiagonal(fromCoord, toCoord);
+    }
+    if (piece.piece.piece === PIECE_KNIGHT) {
+      return isKnightMove(fromCoord, toCoord);
+    }
+    if (piece.piece.piece === PIECE_ROOK) {
+      return isStraight(fromCoord, toCoord);
+    }
+    if (piece.piece.piece === PIECE_PAWN) {
+      return isPawnMove(piece.moved, fromCoord, toCoord, takenPiece, piece.piece.side === WHITE_SIDE);
+    }
+
+    return true
+  } 
+
   function move(fromLocn, toLocn) {
     // find the piece
     var piece = this.state.pieces.find(p => p.location === fromLocn);
-
     var takenPiece = this.state.pieces.find(p => p.location === toLocn);
+    var fromCoord = this.methods.textToLocation(fromLocn);
+    var toCoord = this.methods.textToLocation(toLocn);
+    var pieceCanMove = canMove(piece, fromCoord, toCoord, takenPiece);
+
+    if (!pieceCanMove) {
+      console.log('Piece cannot move!')
+      return this.actions.cloneState();
+    }
 
     if (takenPiece) {
+      // Cannot take your own pieces (including yourself)
+      if (piece.piece.side === takenPiece.piece.side) {
+        return this.actions.cloneState();
+      }
       // taking a piece
       takenPiece.location = "";
     }
@@ -118,13 +229,15 @@ function chessBoardEngineFn()
       // set the location
       piece.location = toLocn;
       piece.moved = true;
+      this.state.fromLocation = fromLocn;
     }
+
     return this.actions.cloneState();
   }
 
   function selectPiece(location) {
     if (this.state.selected) {
-      console.log("selectPiece() second selection")
+      console.log("selectPiece() second selection: " + location)
       if (this.state.selected !== location) {
         // remove selection
         this.actions.move(this.state.selected, location);
@@ -132,8 +245,9 @@ function chessBoardEngineFn()
       // remove selection
       this.state.selected = "";
     } else {
-      console.log("selectPiece() first selection")
+      console.log("selectPiece() first selection: " + location)
       this.state.selected = location;
+      this.state.fromLocation = "";
     }
     return this.actions.cloneState();
   }
