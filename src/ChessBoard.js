@@ -53,27 +53,74 @@ const STARTING_PIECES = [
   { piece: BLACK_PAWN, location: "h7"},
 ];
 
-export default (state = 
-  {
-    selected: "",
-    pieces: []
-  }, action) => {
-  switch (action.type) {
-    case 'RESET':
-      return {
-        selected: "",
-        pieces: STARTING_PIECES.map((p) => { return { piece: p.piece, location: p.location, moved: false };})
-      };
-    case 'CLEAR':
-      return {
-        selected: "",
-        pieces: []
-      };
-      case 'MOVE':
-      break;
-    case 'SELECT':
-      break;
-    default:
-      return state;
+var chessBoardEngine = {
+  createEngine() {
+    return chessBoardEngineFn();
+  }
+};
+
+function chessBoardEngineFn()
+{
+  var obj = {
+    state: {
+      selected: "",
+      pieces: []  
+    }
+  };
+
+  obj.actions = {
+    cloneState: cloneState.bind(obj),
+    clear: clear.bind(obj),
+    reset: reset.bind(obj),
+    move: move.bind(obj),
+    selectPiece: selectPiece.bind(obj)  
+  }
+
+  return obj;
+
+  function cloneState() {
+    this.state = Object.assign({}, this.state);
+    return this.state;
+  }
+
+  function clear() {
+    this.state.selected = "";
+    this.state.pieces = [];
+    return this.actions.cloneState();
+  }
+
+  function reset() {
+    this.state.selected = "";
+    this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: p.location, moved: false };})
+    return this.actions.cloneState();
+  }
+
+  function move(fromLocn, toLocn) {
+    // find the piece
+    var piece = this.state.pieces.find(p => p.location === fromLocn);
+
+    if (piece) {
+      // set the location
+      piece.location = toLocn;
+    }
+    return this.actions.cloneState();
+  }
+
+  function selectPiece(location) {
+    if (this.state.selected) {
+      console.log("selectPiece() second selection")
+      if (this.state.selected !== location) {
+        // remove selection
+        this.actions.move(this.state.selected, location);
+      }
+      // remove selection
+      this.state.selected = "";
+    } else {
+      console.log("selectPiece() first selection")
+      this.state.selected = location;
+    }
+    return this.actions.cloneState();
   }
 }
+
+export default chessBoardEngine

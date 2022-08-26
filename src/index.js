@@ -1,22 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { createStore } from 'redux';
+import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App';
-import ChessBoard from './ChessBoard';
 
+const container = document.getElementById('root')
 
-const store = createStore(ChessBoard);
+const root = createRoot(container)
 
-const render = () => ReactDOM.render(
-  <App
-    value={store.getState()}
-    onMove={() => store.dispatch({ type: 'MOVE' })}
-    onReset={() => store.dispatch({ type: 'RESET' })}
-    onClear={() => store.dispatch({ type: 'CLEAR' })}
-  />,
-  document.getElementById('root')
+root.render(
+  <App />,
 );
 
-render();
-store.subscribe(render);
+

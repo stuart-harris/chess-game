@@ -1,17 +1,16 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { Component } from 'react';
 import './App.css';
+import chessBoardEngine from './ChessBoard'
 
 class App extends Component {
+  engine = chessBoardEngine.createEngine()
+  state = this.engine.state
+
   constructor(props) {
     super(props);
   }
 
-  selectPiece(r, c) {
-
-    var locn = this.makeLocation(r, c);
-    console.log('selectPiece(' + r + ', ' + c + '): ' + locn);
-    // TODO: Use redux to dispatch a call to select a piece
-  }
   // if r=2, c=3, returns d3 (c=3=>d, r=2=>3 1 based)
   makeLocation(r, c) {
     const aVal = "a".charCodeAt(0);
@@ -46,8 +45,36 @@ class App extends Component {
     return board;
   }
 
+  onReset() {
+    this.setState(this.engine.actions.reset());
+  }
+
+  onClear() {
+    this.setState(this.engine.actions.clear());
+  }
+
+  selectPiece(r, c) {
+    var locn = this.makeLocation(r, c);
+    console.log('selectPiece(' + r + ', ' + c + '): ' + locn);
+    // TODO: Use redux to dispatch a call to select a piece
+    this.setState(this.engine.actions.selectPiece(locn));
+  }
+
+  getPieceClasses(r, c, pieceText) {
+    var result = [];
+    if (pieceText) {
+      result.push('piece');
+    }
+    var locn = this.makeLocation(r, c);
+
+    if (this.state.selected) {
+      result.push(locn === this.state.selected ? 'selected' : 'selectable');
+    }
+    return result.join(' ');
+  }
+
   render() {
-    const { value, onMove, onReset, onClear } = this.props;
+    const value = this.state;
     const board = this.generateBoard(value.pieces);
 
     const rows = board.map((row, r_index) =>
@@ -56,23 +83,24 @@ class App extends Component {
         row.map((col, c_index) =>
 <td
   key={'col_' + c_index}
-  className={(!col?'':'piece') + ' ' + (this.makeLocation(r_index, c_index) == value.selected, 'selected', '')}
+  className={this.getPieceClasses(r_index, c_index, col)}
   onClick={(e) => this.selectPiece(r_index, c_index)}
   >
   <span dangerouslySetInnerHTML={{__html: col}}></span>
 </td>
-)
+  )
       }
     </tr>
     );
+
     return (
       <div className="App">
       <h1>A Chess Game</h1>
       <section className="center">
-        <div>
-          <button id="btn-reset" onClick={onReset}>Reset</button>
-          <button id="btn-clear" onClick={onClear}>Clear</button>
-          </div>
+        <div className="margin-bottom-m">
+          <button id="btn-reset" className="btn btn-primary" onClick={() => this.onReset()}>Reset</button>
+          <button id="btn-clear" className="btn margin-left-m" onClick={() => this.onClear()}>Clear</button>
+        </div>
       <table className="board">
         <thead>
           <tr>
