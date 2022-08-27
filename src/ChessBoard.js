@@ -53,6 +53,14 @@ const STARTING_PIECES = [
   { piece: BLACK_PAWN, location: "h7"},
 ];
 
+/*
+move: {
+  piece: BLACK_BISHOP,
+  from: "",
+  to: "",
+  taken: WHITE_BISHOP
+}
+*/
 var chessBoardEngine = {
   createEngine() {
     return chessBoardEngineFn();
@@ -65,7 +73,8 @@ function chessBoardEngineFn()
     state: {
       selected: "",
       fromLocation: "",
-      pieces: []  
+      pieces: [],
+      moves: []
     }
   };
 
@@ -75,6 +84,7 @@ function chessBoardEngineFn()
     reset: reset.bind(obj),
     start: start.bind(obj),
     move: move.bind(obj),
+    addMove: addMove.bind(obj),
     selectPiece: selectPiece.bind(obj)  
   }
 
@@ -118,11 +128,13 @@ function chessBoardEngineFn()
   function clear() {
     this.state.selected = "";
     this.state.pieces = [];
+    this.state.moves = [];
     return this.actions.cloneState();
   }
 
   function reset() {
     this.state.selected = "";
+    this.state.moves = [];
     this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: p.location, moved: false };})
     this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: "", moved: false };})
     return this.actions.cloneState();
@@ -130,6 +142,7 @@ function chessBoardEngineFn()
 
   function start() {
     this.state.selected = "";
+    this.state.moves = [];
     this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: p.location, moved: false };})
     return this.actions.cloneState();
   }
@@ -229,11 +242,20 @@ function chessBoardEngineFn()
       piece.location = toLocn;
       piece.moved = true;
       this.state.fromLocation = fromLocn;
+      this.actions.addMove(piece, takenPiece, fromLocn, toLocn);
     }
 
     return this.actions.cloneState();
   }
 
+  function addMove(piece, taken, from, to) {
+    this.state.moves.push({
+      piece: piece.piece,
+      taken: (taken ? taken.piece : undefined),
+      from: from,
+      to: to
+    });
+  }
   function selectPiece(location) {
     if (this.state.selected) {
       console.log("selectPiece() second selection: " + location)

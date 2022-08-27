@@ -1,2 +1,30 @@
 # chess-eng
-A JavaScript project
+A chess game with a chess engine
+
+## Steps
+* Draw a board [x]
+* Draw pieces [x]
+* Click on pieces to move [x]
+* Basic piece movement (i.e. rook in straight line) [x]
+* Take pieces [x]
+* Restrict take pieces to other colour [x]
+* Taken piece display [x]
+* Move history [ ]
+* Blocking pieces restrict movement [ ]
+* Pawn takes with en passant [ ]
+* Basic castling [ ]
+* Is square threatened [ ]
+* Restrict castling by blocking pieces [ ]
+* Restrict castling by threatened squares [ ]
+* Available moves [ ]
+* Chessbot v1 random moves [ ]
+* Restrict king movement by threats [ ]
+* Restrict piece movement by pinning [ ]
+* Identify check [ ]
+* Identify checkmate [ ]
+* Chessbot v2 avoid threats [ ]
+* Chessbot v3 prefer attacks [ ]
+* Chessbot v4 prefer checks [ ]
+* Chessbot v5 prefer checkmate [ ]
+* Chessbot v6 learn - record database [ ]
+

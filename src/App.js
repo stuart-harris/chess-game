@@ -125,16 +125,42 @@ class App extends Component {
       }
       </div>;
 
+    function formatMove(move) {
+      return move.piece.piece + move.from + (move.taken ? "x" : " ") + move.to;
+    }
+
+    const movesPanel = value.moves.map((m, i, ms) =>
+    {
+      if (i % 2 == 1) return
+      if (i == ms.length - 1) {
+        return <div key={"m-" + i} className="row">
+          <div className="column-3">{i/2+1}. {formatMove(m)}</div>
+          <div className="column-9"></div>
+        </div>
+      } else {
+        return <div key={"m-" + i} className="row">
+          <div className="column-3">{i/2+1}. {formatMove(m)}</div>
+          <div className="column-3">{formatMove(ms[i+1])}</div>
+          <div className="column-6"></div>
+        </div>
+      }
+    }
+    )
+    /*
+    const movesPanel = value.moves.map((m, i, ms) =>
+    {
+        <div key={i} className="">
+          <div className="">{formatMove(m)} {"a"}</div>
+        </div>
+    })
+    */
+
     return (
       <div className="App">
       <h1>A Chess Game</h1>
-      <section className="">
-        <div className="margin-bottom-m">
-          <button id="btn-clear" className="btn" onClick={() => this.onClear()}>Clear</button>
-          <button id="btn-reset" className="btn margin-left-m" onClick={() => this.onReset()}>Reset</button>
-          <button id="btn-start" className="btn btn-primary margin-left-m" onClick={() => this.onStart()}>Start</button>
-        </div>
-      {whiteTaken}
+      <section className="row">
+        <div id="panel-board" className="column-6">
+        {whiteTaken}
       <table className="board">
         <thead>
           <tr>
@@ -165,6 +191,19 @@ class App extends Component {
         </tfoot>
       </table>
       {blackTaken}
+        </div>
+        <div className="column-6">
+          <div id="panel-control">
+            <div className="margin-bottom-m">
+              <button id="btn-clear" className="btn" onClick={() => this.onClear()}>Clear</button>
+              <button id="btn-reset" className="btn margin-left-m" onClick={() => this.onReset()}>Reset</button>
+              <button id="btn-start" className="btn btn-primary margin-left-m" onClick={() => this.onStart()}>Start</button>
+            </div>
+          </div>
+          <div id="panel-moves">
+            {movesPanel}
+          </div>
+        </div>
       </section>
       </div>
       );

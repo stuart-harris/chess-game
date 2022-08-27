@@ -1,7 +1,41 @@
 .App {
-  text-align: center;
   padding: 20px;
   width: 100%;
+}
+
+.column {
+  flex: 50%;
+}
+
+.column-3 {
+  flex: 25%
+}
+
+.column-6 {
+  flex: 50%
+}
+
+.column-9 {
+  flex: 75%
+}
+
+.row {
+  display: flex;
+}
+
+#panel-board {
+}
+
+#panel-control {
+  margin-top: 30px;
+}
+
+#panel-moves {
+  margin-top: 16px;
+}
+
+.center {
+  text-align: center;
 }
 
 .margin-left-m {
@@ -38,16 +72,14 @@ button.btn-primary {
 .taken {
   color: rgb(32, 20, 11);
   font-size: 24px;
-  text-align: left;
-  margin-left: 10%;
   height: 30px; 
 }
 
 table.board {
   background: rgb(196, 120, 69);
   color: rgb(32, 20, 11);
-  width: 704px;
-  margin: 0 10%;
+/*  width: 704px; */
+/*  margin: 0 10%; */
   border-collapse: collapse;
 }
 
@@ -60,6 +92,7 @@ table.board td {
   width: 80px;
   height: 80px;
   font-size: 40pt;
+  text-align: center;
 }
 
 table.board td.piece {
