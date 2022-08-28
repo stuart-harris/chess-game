@@ -11,7 +11,7 @@ A chess game with a chess engine
 * Taken piece display [x]
 * Move history [x]
 * Correct format for move history [ ]
-* Blocking pieces restrict movement [ ]
+* Blocking pieces restrict movement [x]
 * Pawn takes with en passant [ ]
 * Basic castling [ ]
 * Is square threatened [ ]
