@@ -93,7 +93,10 @@ function chessBoardEngineFn()
     locationToText: locationToText.bind(obj),
     isPieceAt: isPieceAt.bind(obj),
     isBlocked: isBlocked.bind(obj),
-    canMove: canMove.bind(obj)
+    canMove: canMove.bind(obj),
+    getSidePieces: getSidePieces.bind(obj),
+    getPieceAtLocation: getPieceAtLocation.bind(obj),
+    isThreatened: isThreatened.bind(obj)
   }
 
   return obj;
@@ -182,14 +185,19 @@ function chessBoardEngineFn()
     return (vDist === 1 && hDist === 2) || (vDist === 2 && hDist === 1);
   }
 
-  function isPawnMove(hasMoved, fromCoord, toCoord, takenPiece, isWhite) {
-    var dir = isWhite ? 1 : -1;
+  function isPawnMove(fromCoord, toCoord, piece, takenPiece) {
+    var dir = piece.piece.side === WHITE_SIDE ? 1 : -1;
     var isForward1 = toCoord.row - fromCoord.row === dir;
     var isForward2 = toCoord.row - fromCoord.row === dir * 2;
     var isSameCol = fromCoord.col === toCoord.col;
     var isSide1 = Math.abs(fromCoord.col - toCoord.col) === 1;
-    return (isSameCol && !takenPiece && (isForward1 || (!hasMoved && isForward2))) ||
-      isSide1 && !!takenPiece && isForward1;
+    return (isSameCol && !takenPiece && (isForward1 || (!piece.moved && isForward2))) ||
+      isSide1 && takenPiece && takenPiece.piece.side !== piece.piece.side  && isForward1;
+  }
+
+  function getPieceAtLocation(coord) {
+    var locn = this.methods.locationToText(coord.row, coord.col);
+    return this.state.pieces.find(p => p.location === locn);
   }
 
   function isPieceAt(row, col) {
@@ -213,12 +221,31 @@ function chessBoardEngineFn()
     return false;
   }
 
+  function otherSide(side) {
+    return side === WHITE_SIDE ? BLACK_SIDE : WHITE_SIDE;
+  }
+
+  function getSidePieces(side) {
+    return this.state.pieces.filter(p => p.piece.side === side);
+  }
+  /**
+   * Is this square threatened
+   * @param side The side who wants to move here
+   * @param {row, col} coord 
+   */
+  function isThreatened(side, coord) {
+    var othSide = otherSide(side);
+    var sidePieces = this.methods.getSidePieces(othSide);
+    var pieceAtLocation = this.methods.getPieceAtLocation(coord)
+    return sidePieces.some(p => this.methods.canMove(p, this.methods.textToLocation(p.location), coord, pieceAtLocation));
+  }
+
   function canMove(piece, fromCoord, toCoord, takenPiece) {
     if (!piece || !piece.piece || !piece.piece.piece) return false;
     if (!isValidLocation(fromCoord) || !isValidLocation(toCoord)) return false;
 
     if (piece.piece.piece === PIECE_KING) {
-      return isOneSquare(fromCoord, toCoord);
+      return isOneSquare(fromCoord, toCoord) && !this.methods.isThreatened(piece.piece.side, toCoord);
     }
     if (piece.piece.piece === PIECE_QUEEN) {
       return isStraightOrDiagonal(fromCoord, toCoord) && !this.methods.isBlocked(fromCoord, toCoord);
@@ -233,7 +260,7 @@ function chessBoardEngineFn()
       return isStraight(fromCoord, toCoord) && !this.methods.isBlocked(fromCoord, toCoord);
     }
     if (piece.piece.piece === PIECE_PAWN) {
-      return isPawnMove(piece.moved, fromCoord, toCoord, takenPiece, piece.piece.side === WHITE_SIDE) &&
+      return isPawnMove(fromCoord, toCoord, piece, takenPiece) &&
       !this.methods.isBlocked(fromCoord, toCoord);
     }
 
