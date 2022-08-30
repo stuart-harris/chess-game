@@ -96,7 +96,8 @@ function chessBoardEngineFn()
     canMove: canMove.bind(obj),
     getSidePieces: getSidePieces.bind(obj),
     getPieceAtLocation: getPieceAtLocation.bind(obj),
-    isThreatened: isThreatened.bind(obj)
+    isThreatened: isThreatened.bind(obj),
+    isKingMove: isKingMove.bind(obj)
   }
 
   return obj;
@@ -179,6 +180,83 @@ function chessBoardEngineFn()
       Math.abs(fromCoord.col - toCoord.col) < 2;
   }
 
+  function isCastle(king, pieces, fromCoord, toCoord) {
+    if (king.moved || (!(toCoord.col === 3 || toCoord.col === 7))) return false;
+
+    if (toCoord.col === 3) {
+      // rook location
+      var rookLocn = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 1);
+      // is the rook there?
+      var rook = pieces.find(p =>
+        p.piece.piece === PIECE_ROOK &&
+        p.piece.side === king.piece.side &&
+        !p.moved &&
+        p.location === rookLocn);
+
+      if (!rook) return false;
+
+      // is there space?
+      var l1 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 2);
+      var l2 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 3);
+      var l3 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 4);
+      var noSpace = pieces.some(p => p.location === l1 || p.location === l2 || p.location === l3)
+      // are there threats?
+      // TODO var threads = 
+      return !noSpace;
+    } else {
+      // rook location
+      var rookLocn = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 8);
+      // is the rook there?
+      var rook = pieces.find(p =>
+        p.piece.piece === PIECE_ROOK &&
+        p.piece.side === king.piece.side &&
+        !p.moved &&
+        p.location === rookLocn);
+
+      if (!rook) return false;
+
+      // is there space?
+      var l1 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 6);
+      var l2 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 7);
+      var noSpace = pieces.some(p => p.location === l1 || p.location === l2)
+      // are there threats?
+      // TODO var threads = 
+      return !noSpace;
+    }
+
+    return false;
+  }
+
+  function castleMoveRook(king, pieces, toCoord) {
+    // rook location
+    var rookLocn = locationToText(
+      king.piece.side === WHITE_SIDE ? 1 : 8,
+      toCoord.col === 3 ? 1 : 8);
+
+    var rookToLocn = locationToText(
+      king.piece.side === WHITE_SIDE ? 1 : 8,
+      toCoord.col === 3 ? 4 : 6);
+
+    // is the rook there?
+    var rook = pieces.find(p =>
+      p.piece.piece === PIECE_ROOK &&
+      p.piece.side === king.piece.side &&
+      !p.moved &&
+      p.location === rookLocn);
+
+    if (rook) {
+      rook.location = rookToLocn;
+    }
+  }
+
+
+
+  function isKingMove(king, pieces, fromCoord, toCoord) {
+    return (isOneSquare(fromCoord, toCoord) ||
+      isCastle(king, pieces, fromCoord, toCoord)) &&
+      !this.methods.isThreatened(king, toCoord)
+  }
+
   function isKnightMove(fromCoord, toCoord) {
     var vDist = Math.abs(fromCoord.row - toCoord.row);
     var hDist = Math.abs(fromCoord.col - toCoord.col);
@@ -244,7 +322,7 @@ function chessBoardEngineFn()
     if (!isValidLocation(fromCoord) || !isValidLocation(toCoord)) return false;
 
     if (piece.piece.piece === PIECE_KING) {
-      return isOneSquare(fromCoord, toCoord) && !this.methods.isThreatened(piece, toCoord);
+      return this.methods.isKingMove(piece, this.state.pieces, fromCoord, toCoord);
     }
     if (piece.piece.piece === PIECE_QUEEN) {
       return isStraightOrDiagonal(fromCoord, toCoord) && !this.methods.isBlocked(fromCoord, toCoord);
@@ -289,6 +367,9 @@ function chessBoardEngineFn()
     }
 
     if (piece) {
+      if (piece.piece.piece === PIECE_KING && isCastle(piece, this.state.pieces, fromCoord, toCoord)) {
+        castleMoveRook(piece, this.state.pieces, toCoord);
+      }
       // set the location
       piece.location = toLocn;
       piece.moved = true;
