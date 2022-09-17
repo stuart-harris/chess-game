@@ -76,7 +76,9 @@ function chessBoardEngineFn()
       pieces: [],
       turn: "",
       moves: [],
-      availableMoves: []
+      availableMoves: [],
+      chessBot: "Snizzle-smark",
+      chessBotNextMove: undefined
     }
   };
 
@@ -100,6 +102,7 @@ function chessBoardEngineFn()
     getPieceAtLocation: getPieceAtLocation.bind(obj),
     isThreatened: isThreatened.bind(obj),
     isKingMove: isKingMove.bind(obj),
+    chessBotChooseMove: chessBotChooseMove.bind(obj),
     calculateAvailableMoves: calculateAvailableMoves.bind(obj),
     calculateAvailableMovesForPiece: calculateAvailableMovesForPiece.bind(obj),
     calculateAvailableMovesForKing: calculateAvailableMovesForKing.bind(obj),
@@ -170,6 +173,7 @@ function chessBoardEngineFn()
     this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: p.location, moved: false };})
     this.state.turn = WHITE_SIDE;
     this.methods.calculateAvailableMoves();
+    this.methods.chessBotChooseMove();
     return this.actions.cloneState();
   }
 
@@ -405,6 +409,7 @@ function chessBoardEngineFn()
       this.actions.addMove(piece, takenPiece, fromLocn, toLocn);
       this.state.turn = this.state.moves.length % 2 ? BLACK_SIDE : WHITE_SIDE;
       this.methods.calculateAvailableMoves();
+      this.methods.chessBotChooseMove();
     }
 
     return this.actions.cloneState();
@@ -438,6 +443,15 @@ function chessBoardEngineFn()
       }
     }
     return this.actions.cloneState();
+  }
+
+  function chessBotChooseMove() {
+    if (this.state.availableMoves && this.state.availableMoves.length) {
+      var idx = Math.floor(Math.random() * this.state.availableMoves.length);
+      this.state.chessBotNextMove = this.state.availableMoves[idx];
+    } else {
+      this.state.chessBotNextMove = undefined;
+    }
   }
 
   function calculateAvailableMoves() {

@@ -34,7 +34,8 @@ A chess game with a chess engine
 * Available moves - king &check;
 * Available moves - castle [ ]
 * Available moves - restrict if move would be in check [ ]
-* Chessbot v1 random moves [ ]
+* Chessbot v1 random moves &check;
+* Make Chessbot play [ ]
 * Restrict king movement by threats &check;
 * Restrict piece movement by pinning [ ]
 * Identify check [ ]

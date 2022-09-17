@@ -104,35 +104,35 @@ table.board tbody tr td:first-child::before {
 }
 
 table.board tbody tr:first-child td:first-child::before {
-  content: "1";
+  content: "8";
 }
 
 table.board tbody tr:nth-child(2) td:first-child::before {
-  content: "2";
-}
-
-table.board tbody tr:nth-child(3) td:first-child::before {
-  content: "3";
-}
-
-table.board tbody tr:nth-child(4) td:first-child::before {
-  content: "4";
-}
-
-table.board tbody tr:nth-child(5) td:first-child::before {
-  content: "5";
-}
-
-table.board tbody tr:nth-child(6) td:first-child::before {
-  content: "6";
-}
-
-table.board tbody tr:nth-child(7) td:first-child::before {
   content: "7";
 }
 
+table.board tbody tr:nth-child(3) td:first-child::before {
+  content: "6";
+}
+
+table.board tbody tr:nth-child(4) td:first-child::before {
+  content: "5";
+}
+
+table.board tbody tr:nth-child(5) td:first-child::before {
+  content: "4";
+}
+
+table.board tbody tr:nth-child(6) td:first-child::before {
+  content: "3";
+}
+
+table.board tbody tr:nth-child(7) td:first-child::before {
+  content: "2";
+}
+
 table.board tbody tr:nth-child(8) td:first-child::before {
-  content: "8";
+  content: "1";
 }
 
 table.board td.piece.turn {

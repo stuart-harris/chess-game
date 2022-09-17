@@ -143,8 +143,9 @@ class App extends Component {
       </div>;
 
     function formatMove(move) {
-      console.log(move);
-      return move.piece.piece + move.from + (move.taken ? "x" : " ") + move.to;
+      // console.log(move);
+      if(move) return move.piece.piece + move.from + (move.taken ? "x" : " ") + move.to;
+      return "-";
     }
 
     const movesPanel = value.moves.map((m, i, ms) =>
@@ -222,8 +223,16 @@ class App extends Component {
           </div>
           <hr/>
           <div id="panel-available-moves">
-            <p>Available moves</p>
-            {availableMovesPanel}
+            <div className="row">
+              <div className="column-3">
+                <p>Available moves</p>
+                {availableMovesPanel}
+              </div>
+              <div className="column-3">
+                <p>What would {value.chessBot} do?</p>
+                <p>{formatMove(value.chessBotNextMove)}</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
