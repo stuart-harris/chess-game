@@ -28,10 +28,10 @@ A chess game with a chess engine
 ## Chess bot
 * Available moves - pawn &check;
 * Available moves - rook &check;
-* Available moves - knight [ ]
-* Available moves - bishop [ ]
-* Available moves - queen [ ]
-* Available moves - king [ ]
+* Available moves - knight &check;
+* Available moves - bishop &check;
+* Available moves - queen &check;
+* Available moves - king &check;
 * Available moves - castle [ ]
 * Available moves - restrict if move would be in check [ ]
 * Chessbot v1 random moves [ ]

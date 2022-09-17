@@ -97,7 +97,6 @@ class App extends Component {
     if (value.turn) {
       turnsPanel =
         <div>
-
           <div id="panel-turns">
             <p>{ value.turn + " to move." }</p>
           </div>
@@ -106,7 +105,7 @@ class App extends Component {
       }
 
     const rows = board.map((row, r_index) =>
-    <tr key={'row_' + r_index}>
+      <tr key={'row_' + r_index}>
       {
         row.map((sq, c_index) =>
           <td

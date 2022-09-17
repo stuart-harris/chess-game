@@ -6,18 +6,18 @@ const PIECE_BISHOP = "B";
 const PIECE_ROOK = "R";
 const PIECE_KNIGHT = "N";
 const PIECE_PAWN = "P";
-const WHITE_KING = { piece: PIECE_KING, text: "&#x2654;", side: WHITE_SIDE};
-const WHITE_QUEEN = { piece: PIECE_QUEEN, text: "&#x2655;", side: WHITE_SIDE};
-const WHITE_BISHOP = { piece: PIECE_BISHOP, text: "&#x2657;", side: WHITE_SIDE};
-const WHITE_KNIGHT = { piece: PIECE_KNIGHT, text: "&#x2658;", side: WHITE_SIDE};
-const WHITE_ROOK = { piece: PIECE_ROOK, text: "&#x2656;", side: WHITE_SIDE};
-const WHITE_PAWN = { piece: PIECE_PAWN, text: "&#x2659;", side: WHITE_SIDE};
-const BLACK_KING = { piece: PIECE_KING, text: "&#x265A;", side: BLACK_SIDE};
-const BLACK_QUEEN = { piece: PIECE_QUEEN, text: "&#x265B;", side: BLACK_SIDE};
-const BLACK_BISHOP = { piece: PIECE_BISHOP, text: "&#x265D;", side: BLACK_SIDE};
-const BLACK_KNIGHT = { piece: PIECE_KNIGHT, text: "&#x265E;", side: BLACK_SIDE};
-const BLACK_ROOK = { piece: PIECE_ROOK, text: "&#x265C;", side: BLACK_SIDE};
-const BLACK_PAWN = { piece: PIECE_PAWN, text: "&#x265F;", side: BLACK_SIDE};
+const WHITE_KING = { piece: PIECE_KING, value: 200, text: "&#x2654;", side: WHITE_SIDE};
+const WHITE_QUEEN = { piece: PIECE_QUEEN, value: 9, text: "&#x2655;", side: WHITE_SIDE};
+const WHITE_BISHOP = { piece: PIECE_BISHOP, value: 3, text: "&#x2657;", side: WHITE_SIDE};
+const WHITE_KNIGHT = { piece: PIECE_KNIGHT, value: 3, text: "&#x2658;", side: WHITE_SIDE};
+const WHITE_ROOK = { piece: PIECE_ROOK, value: 5, text: "&#x2656;", side: WHITE_SIDE};
+const WHITE_PAWN = { piece: PIECE_PAWN, value: 1, text: "&#x2659;", side: WHITE_SIDE};
+const BLACK_KING = { piece: PIECE_KING, value: 200, text: "&#x265A;", side: BLACK_SIDE};
+const BLACK_QUEEN = { piece: PIECE_QUEEN, value: 9, text: "&#x265B;", side: BLACK_SIDE};
+const BLACK_BISHOP = { piece: PIECE_BISHOP, value: 3, text: "&#x265D;", side: BLACK_SIDE};
+const BLACK_KNIGHT = { piece: PIECE_KNIGHT, value: 3, text: "&#x265E;", side: BLACK_SIDE};
+const BLACK_ROOK = { piece: PIECE_ROOK, value: 5, text: "&#x265C;", side: BLACK_SIDE};
+const BLACK_PAWN = { piece: PIECE_PAWN, value: 1, text: "&#x265F;", side: BLACK_SIDE};
 const STARTING_PIECES = [
   { piece: WHITE_KING, location: "e1"},
   { piece: WHITE_QUEEN, location: "d1"},
@@ -102,6 +102,10 @@ function chessBoardEngineFn()
     isKingMove: isKingMove.bind(obj),
     calculateAvailableMoves: calculateAvailableMoves.bind(obj),
     calculateAvailableMovesForPiece: calculateAvailableMovesForPiece.bind(obj),
+    calculateAvailableMovesForKing: calculateAvailableMovesForKing.bind(obj),
+    calculateAvailableMovesForQueen: calculateAvailableMovesForQueen.bind(obj),
+    calculateAvailableMovesForBishop: calculateAvailableMovesForBishop.bind(obj),
+    calculateAvailableMovesForKnight: calculateAvailableMovesForKnight.bind(obj),
     calculateAvailableMovesForRook: calculateAvailableMovesForRook.bind(obj),
     calculateAvailableMovesForPawn: calculateAvailableMovesForPawn.bind(obj)
   }
@@ -143,6 +147,7 @@ function chessBoardEngineFn()
     this.state.selected = "";
     this.state.pieces = [];
     this.state.moves = [];
+    this.state.availableMoves = [];
     this.state.turn = "";
     return this.actions.cloneState();
   }
@@ -151,6 +156,7 @@ function chessBoardEngineFn()
     console.log("reset()");
     this.state.selected = "";
     this.state.moves = [];
+    this.state.availableMoves = [];
     this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: "", moved: false };})
     this.state.turn = "";
     return this.actions.cloneState();
@@ -160,8 +166,10 @@ function chessBoardEngineFn()
     console.log("start()");
     this.state.selected = "";
     this.state.moves = [];
+    this.state.availableMoves = [];
     this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: p.location, moved: false };})
     this.state.turn = WHITE_SIDE;
+    this.methods.calculateAvailableMoves();
     return this.actions.cloneState();
   }
 
@@ -458,11 +466,79 @@ function chessBoardEngineFn()
     if (piece.piece.piece === PIECE_ROOK) {
       return this.methods.calculateAvailableMovesForRook(piece, coord, pieces);
     }
+    if (piece.piece.piece === PIECE_KNIGHT) {
+      return this.methods.calculateAvailableMovesForKnight(piece, coord, pieces);
+    }
+    if (piece.piece.piece === PIECE_BISHOP) {
+      return this.methods.calculateAvailableMovesForBishop(piece, coord, pieces);
+    }
+    if (piece.piece.piece === PIECE_QUEEN) {
+      return this.methods.calculateAvailableMovesForQueen(piece, coord, pieces);
+    }
+    if (piece.piece.piece === PIECE_KING) {
+      return this.methods.calculateAvailableMovesForKing(piece, coord, pieces);
+    }
+
     return [];
   }
 
-  function calculateAvailableMovesForRook(piece, coord, pieces) {
+  function calculateAvailableMovesForBishop(piece, coord, pieces, distanceLimit) {
     var moves = [];
+
+    if (!distanceLimit) {
+      distanceLimit = 8;
+    }
+    var to = { row: coord.row, col: coord.col };
+
+    let dc;
+    let dr;
+    for(var d = 0; d < 4; d++) {
+      switch(d) {
+        case 0: // northeast
+          dc = 1;
+          dr = -1;
+          break;
+        case 1: // northwest
+          dc = -1;
+          dr = -1;
+          break;
+        case 2: // southeast
+          dc = 1;
+          dr = 1;
+          break;
+        case 3: // southwest
+          dc = -1;
+          dr = 1;
+          break;
+      }
+
+      var distance = 0;
+      var blocked = false;
+      for(var c = coord.col + dc, r = coord.row + dr;
+        !blocked && c > 0 && c < 9 && r > 0 && r < 9 && distance < distanceLimit;
+        c += dc, r += dr, distance++) {
+        to = { row: r, col: c};
+        var taken = getPieceAt(pieces, to);
+        if (taken) {
+          blocked = true;
+          if (taken.piece.side !== piece.piece.side) {
+            moves.push(makeMove(piece, taken, coord, to))
+          }
+        } else {
+          moves.push(makeMove(piece, undefined, coord, to))
+        }
+      }
+    }
+
+    return moves;
+  }
+
+  function calculateAvailableMovesForRook(piece, coord, pieces, distanceLimit) {
+    var moves = [];
+
+    if (!distanceLimit) {
+      distanceLimit = 8;
+    }
 
     var to = { row: coord.row, col: coord.col };
 
@@ -489,9 +565,10 @@ function chessBoardEngineFn()
       }
 
       var blocked = false;
+      var distance = 0;
       for(var c = coord.col + dc, r = coord.row + dr;
-        !blocked && c > 0 && c < 9 && r > 0 && r < 9;
-        c += dc, r += dr) {
+        !blocked && c > 0 && c < 9 && r > 0 && r < 9 && distance < distanceLimit;
+        c += dc, r += dr, distance++) {
         to = { row: r, col: c};
         var taken = getPieceAt(pieces, to);
         if (taken) {
@@ -508,6 +585,48 @@ function chessBoardEngineFn()
     return moves;
   }
 
+  function calculateAvailableMovesForKing(piece, coord, pieces) {
+    var moves = calculateAvailableMovesForRook(piece, coord, pieces, 1);
+    return moves.concat(calculateAvailableMovesForBishop(piece, coord, pieces, 1));
+  }
+
+  function calculateAvailableMovesForQueen(piece, coord, pieces) {
+    var moves = calculateAvailableMovesForRook(piece, coord, pieces);
+    return moves.concat(calculateAvailableMovesForBishop(piece, coord, pieces));
+  }
+
+  function calculateAvailableMovesForKnight(piece, coord, pieces) {
+    var moves = [];
+
+    let to;
+    let dc;
+    let dr;
+    for(var d = 0; d < 8; d++) {
+      switch(d) {
+        case 0: dc = 2; dr = 1; break;
+        case 1: dc = 1; dr = 2; break;
+        case 2: dc = -2; dr = 1; break;
+        case 3: dc = -1; dr = 2; break;
+        case 4: dc = -2; dr = -1; break;
+        case 5: dc = -1; dr = -2; break;
+        case 6: dc = 2; dr = -1; break;
+        case 7: dc = 1; dr = -2; break;
+      }
+
+      to = { row: coord.row + dr, col: coord.col + dc };
+      if(!isValidCoord(to)) continue;
+      var taken = getPieceAt(pieces, to);
+      if (taken) {
+        if (taken.piece.side !== piece.piece.side) {
+          moves.push(makeMove(piece, taken, coord, to))
+        }
+      } else {
+        moves.push(makeMove(piece, undefined, coord, to))
+      }
+    }
+
+    return moves;
+  }
 
   function calculateAvailableMovesForPawn(piece, coord, pieces) {
     var moves = [];
