@@ -232,6 +232,8 @@ class App extends Component {
                 <p>What would {value.chessBot} do?</p>
                 <p>{formatMove(value.chessBotNextMove)}</p>
               </div>
+              <div className="column-6">
+              </div>
             </div>
           </div>
         </div>
