@@ -3,38 +3,39 @@ A chess game with a chess engine
 
 # Steps
 ## Drawing
-* Draw a board [x]
-* Draw pieces [x]
-* Taken piece display [x]
+* Draw a board &check;
+* Draw pieces &check;
+* Taken piece display &check;
 * Show whose turn [ ]
 
 ## Moves
-* Click on pieces to move [x]
-* Basic piece movement (i.e. rook in straight line) [x]
-* Move history [x]
+* Click on pieces to move &check;
+* Basic piece movement (i.e. rook in straight line) &check;
+* Move history &check;
 * Correct format for move history [ ]
-* Blocking pieces restrict movement [x]
+* Blocking pieces restrict movement &check;
 * Pawn takes with en passant [ ]
-* Basic castling [x]
-* Restrict castling by blocking pieces [x]
+* Basic castling &check;
+* Restrict castling by blocking pieces &check;
 * Restrict castling by threatened squares [ ]
-* Enforce taking turns [x]
+* Enforce taking turns &check;
 
 ## Capture
-* Take pieces [x]
-* Restrict take pieces to other colour [x]
-* Is square threatened [x]
+* Take pieces &check;
+* Restrict take pieces to other colour &check;
+* Is square threatened &check;
 
 ## Chess bot
-* Available moves - pawn [x]
-* Available moves - rook [ ]
+* Available moves - pawn &check;
+* Available moves - rook &check;
 * Available moves - knight [ ]
 * Available moves - bishop [ ]
 * Available moves - queen [ ]
 * Available moves - king [ ]
 * Available moves - castle [ ]
+* Available moves - restrict if move would be in check [ ]
 * Chessbot v1 random moves [ ]
-* Restrict king movement by threats [x]
+* Restrict king movement by threats &check;
 * Restrict piece movement by pinning [ ]
 * Identify check [ ]
 * Identify checkmate [ ]

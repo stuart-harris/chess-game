@@ -102,6 +102,7 @@ function chessBoardEngineFn()
     isKingMove: isKingMove.bind(obj),
     calculateAvailableMoves: calculateAvailableMoves.bind(obj),
     calculateAvailableMovesForPiece: calculateAvailableMovesForPiece.bind(obj),
+    calculateAvailableMovesForRook: calculateAvailableMovesForRook.bind(obj),
     calculateAvailableMovesForPawn: calculateAvailableMovesForPawn.bind(obj)
   }
 
@@ -454,8 +455,59 @@ function chessBoardEngineFn()
     if (piece.piece.piece === PIECE_PAWN) {
       return this.methods.calculateAvailableMovesForPawn(piece, coord, pieces);
     }
+    if (piece.piece.piece === PIECE_ROOK) {
+      return this.methods.calculateAvailableMovesForRook(piece, coord, pieces);
+    }
     return [];
   }
+
+  function calculateAvailableMovesForRook(piece, coord, pieces) {
+    var moves = [];
+
+    var to = { row: coord.row, col: coord.col };
+
+    let dc;
+    let dr;
+    for(var d = 0; d < 4; d++) {
+      switch(d) {
+        case 0: // east
+          dc = 1;
+          dr = 0;
+          break;
+        case 1: // west
+          dc = -1;
+          dr = 0;
+          break;
+        case 2: // north
+          dc = 0;
+          dr = -1;
+          break;
+        case 3: // south
+          dc = 0;
+          dr = 1;
+          break;
+      }
+
+      var blocked = false;
+      for(var c = coord.col + dc, r = coord.row + dr;
+        !blocked && c > 0 && c < 9 && r > 0 && r < 9;
+        c += dc, r += dr) {
+        to = { row: r, col: c};
+        var taken = getPieceAt(pieces, to);
+        if (taken) {
+          blocked = true;
+          if (taken.piece.side !== piece.piece.side) {
+            moves.push(makeMove(piece, taken, coord, to))
+          }
+        } else {
+          moves.push(makeMove(piece, undefined, coord, to))
+        }
+      }
+    }
+
+    return moves;
+  }
+
 
   function calculateAvailableMovesForPawn(piece, coord, pieces) {
     var moves = [];
