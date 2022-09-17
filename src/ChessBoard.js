@@ -74,7 +74,9 @@ function chessBoardEngineFn()
       selected: "",
       fromLocation: "",
       pieces: [],
-      moves: []
+      turn: "",
+      moves: [],
+      availableMoves: []
     }
   };
 
@@ -97,7 +99,10 @@ function chessBoardEngineFn()
     getSidePieces: getSidePieces.bind(obj),
     getPieceAtLocation: getPieceAtLocation.bind(obj),
     isThreatened: isThreatened.bind(obj),
-    isKingMove: isKingMove.bind(obj)
+    isKingMove: isKingMove.bind(obj),
+    calculateAvailableMoves: calculateAvailableMoves.bind(obj),
+    calculateAvailableMovesForPiece: calculateAvailableMovesForPiece.bind(obj),
+    calculateAvailableMovesForPawn: calculateAvailableMovesForPawn.bind(obj)
   }
 
   return obj;
@@ -133,24 +138,29 @@ function chessBoardEngineFn()
   }
 
   function clear() {
+    console.log("clear()");
     this.state.selected = "";
     this.state.pieces = [];
     this.state.moves = [];
+    this.state.turn = "";
     return this.actions.cloneState();
   }
 
   function reset() {
+    console.log("reset()");
     this.state.selected = "";
     this.state.moves = [];
-    this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: p.location, moved: false };})
     this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: "", moved: false };})
+    this.state.turn = "";
     return this.actions.cloneState();
   }
 
   function start() {
+    console.log("start()");
     this.state.selected = "";
     this.state.moves = [];
     this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: p.location, moved: false };})
+    this.state.turn = WHITE_SIDE;
     return this.actions.cloneState();
   }
 
@@ -274,15 +284,24 @@ function chessBoardEngineFn()
   }
 
   function getPieceAtLocation(coord) {
-    var locn = this.methods.locationToText(coord.row, coord.col);
+    var locn = locationToText(coord.row, coord.col);
     return this.state.pieces.find(p => p.location === locn);
   }
 
   function isPieceAt(row, col) {
-    var locn = this.methods.locationToText(row, col);
+    var locn = locationToText(row, col);
     var result = this.state.pieces.some(p => p.location === locn);
     //console.log('isPieceAt("' + locn + '"): ' + result)
     return result;
+  }
+
+  function getPieceAt(pieces, coord) {
+    var locn = locationToText(coord.row, coord.col);
+    return pieces.find(p => p.location === locn);
+  }
+
+  function isValidCoord(coord) {
+    return coord.row > 0 && coord.row < 9 && coord.col > 0 && coord.col < 9;
   }
 
   function isBlocked(fromCoord, toCoord) {
@@ -314,7 +333,7 @@ function chessBoardEngineFn()
   function isThreatened(movingPiece, coord) {
     var othSide = otherSide(movingPiece.piece.side);
     var sidePieces = this.methods.getSidePieces(othSide);
-    return sidePieces.some(p => this.methods.canMove(p, this.methods.textToLocation(p.location), coord, movingPiece, true));
+    return sidePieces.some(p => p.location && this.methods.canMove(p, this.methods.textToLocation(p.location), coord, movingPiece, true));
   }
 
   function canMove(piece, fromCoord, toCoord, takenPiece, isThreat) {
@@ -375,6 +394,8 @@ function chessBoardEngineFn()
       piece.moved = true;
       this.state.fromLocation = fromLocn;
       this.actions.addMove(piece, takenPiece, fromLocn, toLocn);
+      this.state.turn = this.state.moves.length % 2 ? BLACK_SIDE : WHITE_SIDE;
+      this.methods.calculateAvailableMoves();
     }
 
     return this.actions.cloneState();
@@ -398,12 +419,83 @@ function chessBoardEngineFn()
       // remove selection
       this.state.selected = "";
     } else {
-      console.log("selectPiece() first selection: " + location)
-      this.state.selected = location;
-      this.state.fromLocation = "";
+      var p = this.state.pieces.find(p => p.location === location);
+      if (p && p.piece.side === this.state.turn) {
+        console.log("selectPiece() first selection: " + location)
+        this.state.selected = location;
+        this.state.fromLocation = "";
+      } else {
+        console.log("selectPiece() Not your turn");
+      }
     }
     return this.actions.cloneState();
   }
+
+  function calculateAvailableMoves() {
+    /*
+    // this.state.turn = BLACK_SIDE or WHITE_SIDE
+    // this.state.pieces
+    // STARTING_PIECES.map((p) => { return { piece: p.piece, location: "", moved: false };})
+    */
+    let moves = [];
+    var piecesOnBoard = this.state.pieces.filter((p) => p.location);
+    var pieces = piecesOnBoard.filter((p) => p.piece.side === this.state.turn);
+
+    for(var i = 0; i < pieces.length; i++) {
+      var p = pieces[i];
+      var coord = textToLocation(p.location);
+      moves.push(...this.methods.calculateAvailableMovesForPiece(p, coord, piecesOnBoard));
+    }
+    this.state.availableMoves = moves;
+    console.log('available moves : ', moves);
+  }
+
+  function calculateAvailableMovesForPiece(piece, coord, pieces) {
+    if (piece.piece.piece === PIECE_PAWN) {
+      return this.methods.calculateAvailableMovesForPawn(piece, coord, pieces);
+    }
+    return [];
+  }
+
+  function calculateAvailableMovesForPawn(piece, coord, pieces) {
+    var moves = [];
+    var dir = piece.piece.side === WHITE_SIDE ? 1 : -1;
+    var to = { row: coord.row + dir, col: coord.col };
+
+    var taken = getPieceAt(pieces, to);
+
+    if (isValidCoord(to) && !taken) {
+      moves.push(makeMove(piece, undefined, coord, to))
+    }
+
+    to = { row: coord.row + dir, col: coord.col - 1 };
+    taken = getPieceAt(pieces, to);
+
+    if (isValidCoord(to) && taken && taken.piece.side !== piece.piece.side) {
+      moves.push(makeMove(piece, taken.piece, coord, to));
+    }
+
+    to = { row: coord.row + dir, col: coord.col + 1 };
+    taken = getPieceAt(pieces, to);
+
+    if (isValidCoord(to) && taken && taken.piece.side !== piece.piece.side) {
+      moves.push(makeMove(piece, taken.piece, coord, to));
+    }
+
+    // TODO: en passant
+
+    return moves;
+  }
+
+  function makeMove(piece, takenPiece, fromCoord, toCoord) {
+    return {
+      piece: piece.piece,
+      taken: takenPiece,
+      from: locationToText(fromCoord.row, fromCoord.col),
+      to: locationToText(toCoord.row, toCoord.col)
+    }
+  }
+
 }
 
 export default chessBoardEngine

@@ -47,6 +47,7 @@
 }
 
 button, .btn {
+  cursor: pointer;
   height: 44px;
   background: moccasin;
   font-weight: 500;
@@ -95,7 +96,7 @@ table.board td {
   text-align: center;
 }
 
-table.board td.piece {
+table.board td.piece.turn {
   cursor: pointer;
 }
 
@@ -103,7 +104,7 @@ table.board tr:nth-child(even) td:nth-child(even), tr:nth-child(odd) td:nth-chil
 	background: moccasin;
 }
 
-table.board td.piece:hover, table.board td.selectable:hover {
+table.board td.piece.turn:hover, table.board td.selectable:hover {
   background: rgb(223, 150, 101);
   font-size: 48pt;
   box-shadow: 0px 0px 2px 2px #f1a92b;

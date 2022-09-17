@@ -14,14 +14,14 @@ class App extends Component {
   // generate a 2 x 2 array of string to render on the board
   generateBoard(pieces) {
     var board = [
-      ["","","","","","","",""],
-      ["","","","","","","",""],
-      ["","","","","","","",""],
-      ["","","","","","","",""],
-      ["","","","","","","",""],
-      ["","","","","","","",""],
-      ["","","","","","","",""],
-      ["","","","","","","",""]
+      [{},{},{},{},{},{},{},{}],
+      [{},{},{},{},{},{},{},{}],
+      [{},{},{},{},{},{},{},{}],
+      [{},{},{},{},{},{},{},{}],
+      [{},{},{},{},{},{},{},{}],
+      [{},{},{},{},{},{},{},{}],
+      [{},{},{},{},{},{},{},{}],
+      [{},{},{},{},{},{},{},{}]
     ];
 
     const aVal = "a".charCodeAt(0);
@@ -30,7 +30,7 @@ class App extends Component {
       let p = pieces[i];
       var coord = this.engine.methods.textToLocation(p.location);
       if (!coord) continue;
-      board[8-coord.row][coord.col-1] = p.piece.text;
+      board[8-coord.row][coord.col-1] = p.piece;
     }
 
     return board;
@@ -64,11 +64,17 @@ class App extends Component {
     this.setState(this.engine.actions.selectPiece(locn));
   }
 
-  getPieceClasses(r, c, pieceText) {
+  getPieceClasses(r, c, piece) {
     var result = [];
-    if (pieceText) {
+    
+    if (piece.text) {
       result.push('piece');
     }
+
+    if (piece && piece.side == this.state.turn) {
+      result.push('turn');
+    }
+
     var bCoords = this.coordsToBoard({row: r, col: c});
     var locn = this.engine.methods.locationToText(bCoords.row, bCoords.col);
 
@@ -87,18 +93,30 @@ class App extends Component {
     const value = this.state;
     const board = this.generateBoard(value.pieces);
 
+    let turnsPanel;
+    if (value.turn) {
+      turnsPanel =
+        <div>
+
+          <div id="panel-turns">
+            <p>{ value.turn + " to move." }</p>
+          </div>
+          <hr/>
+        </div> 
+      }
+
     const rows = board.map((row, r_index) =>
     <tr key={'row_' + r_index}>
       {
-        row.map((col, c_index) =>
-<td
-  key={'col_' + c_index}
-  className={this.getPieceClasses(r_index, c_index, col)}
-  onClick={(e) => this.selectPiece(r_index, c_index)}
-  >
-  <span dangerouslySetInnerHTML={{__html: col}}></span>
-</td>
-  )
+        row.map((sq, c_index) =>
+          <td
+            key={'col_' + c_index}
+            className={this.getPieceClasses(r_index, c_index, sq)}
+            onClick={(e) => this.selectPiece(r_index, c_index)}
+          >
+                <span dangerouslySetInnerHTML={{__html: sq.text}}></span>
+          </td>
+        )
       }
     </tr>
     );
@@ -107,7 +125,7 @@ class App extends Component {
     <div className="taken">
       {
     value.pieces
-    .filter(p => p.piece.side === "White" && p.location === "")
+    .filter(p => p.piece.side === "White" && p.location === null)
     .map((p, i) =>
         <span key={i} dangerouslySetInnerHTML={{__html: p.piece.text}}></span>  
     )
@@ -118,7 +136,7 @@ class App extends Component {
     <div className="taken">
       {
     value.pieces
-    .filter(p => p.piece.side === "Black" && p.location === "")
+    .filter(p => p.piece.side === "Black" && p.location === null)
     .map((p, i) =>
         <span key={i} dangerouslySetInnerHTML={{__html: p.piece.text}}></span>  
     )
@@ -126,6 +144,7 @@ class App extends Component {
       </div>;
 
     function formatMove(move) {
+      console.log(move);
       return move.piece.piece + move.from + (move.taken ? "x" : " ") + move.to;
     }
 
@@ -146,14 +165,11 @@ class App extends Component {
       }
     }
     )
-    /*
-    const movesPanel = value.moves.map((m, i, ms) =>
-    {
-        <div key={i} className="">
-          <div className="">{formatMove(m)} {"a"}</div>
-        </div>
-    })
-    */
+
+    const availableMovesPanel = 
+        value.availableMoves.map((m, i, ms) => 
+        <div key={"am-" + i}>{formatMove(m)}</div>
+      )  
 
     return (
       <div className="App">
@@ -200,8 +216,15 @@ class App extends Component {
               <button id="btn-start" className="btn btn-primary margin-left-m" onClick={() => this.onStart()}>Start</button>
             </div>
           </div>
+          {turnsPanel}
           <div id="panel-moves">
+            <p>Moves</p>
             {movesPanel}
+          </div>
+          <hr/>
+          <div id="panel-available-moves">
+            <p>Available moves</p>
+            {availableMovesPanel}
           </div>
         </div>
       </section>
