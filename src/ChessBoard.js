@@ -81,6 +81,7 @@ function chessBoardEngineFn()
       chessBot: undefined,
       chessBotNextMove: undefined,
       chessBots: [{
+        id: "random",
         name: "Snizzle-smark",
         description: "Completely random.",
         settings: {
@@ -89,12 +90,23 @@ function chessBoardEngineFn()
           avoidSacrifice: false,
           protectThreatened: false
         }
-      },{
+      }, {
+        id: "take",
         name: "Takarmada",
         description: "Will try to take everything.",
         settings: {
           preferTake: true,
           takeMostValue: false,
+          avoidSacrifice: false,
+          protectThreatened: false
+        }
+      }, {
+        id: "value",
+        name: "Mauricebeta",
+        description: "Will try to take the most valueable thing.",
+        settings: {
+          preferTake: true,
+          takeMostValue: true,
           avoidSacrifice: false,
           protectThreatened: false
         }
@@ -110,7 +122,8 @@ function chessBoardEngineFn()
     start: start.bind(obj),
     move: move.bind(obj),
     addMove: addMove.bind(obj),
-    selectPiece: selectPiece.bind(obj)  
+    selectPiece: selectPiece.bind(obj),
+    selectBot: selectBot.bind(obj)
   }
 
   obj.methods = {
@@ -123,6 +136,7 @@ function chessBoardEngineFn()
     getPieceAtLocation: getPieceAtLocation.bind(obj),
     isThreatened: isThreatened.bind(obj),
     isKingMove: isKingMove.bind(obj),
+    chessBotMove: chessBotMove.bind(obj),
     chessBotChooseMove: chessBotChooseMove.bind(obj),
     calculateAvailableMoves: calculateAvailableMoves.bind(obj),
     calculateAvailableMovesForPiece: calculateAvailableMovesForPiece.bind(obj),
@@ -169,8 +183,9 @@ function chessBoardEngineFn()
   function clear() {
     console.log("clear()");
     this.state.isPlaying = false;
-    this.chessBot = undefined;
+    this.state.chessBot = undefined;
     this.state.selected = "";
+    this.state.fromLocation = "";
     this.state.pieces = [];
     this.state.moves = [];
     this.state.availableMoves = [];
@@ -181,8 +196,9 @@ function chessBoardEngineFn()
   function reset() {
     console.log("reset()");
     this.state.isPlaying = false;
-    this.chessBot = undefined;
+    this.state.chessBot = undefined;
     this.state.selected = "";
+    this.state.fromLocation = "";
     this.state.moves = [];
     this.state.availableMoves = [];
     this.state.pieces = STARTING_PIECES.map((p) => { return { piece: p.piece, location: "", moved: false };})
@@ -200,6 +216,13 @@ function chessBoardEngineFn()
     this.state.turn = WHITE_SIDE;
     this.methods.calculateAvailableMoves();
     this.methods.chessBotChooseMove();
+    return this.actions.cloneState();
+  }
+
+  function selectBot(id) {
+    console.log("selectBot(id=" + id + ")");
+    var bot = this.state.chessBots.find((cb) => cb.id === id);
+    this.state.chessBot = bot;
     return this.actions.cloneState();
   }
 
@@ -436,6 +459,11 @@ function chessBoardEngineFn()
       this.state.turn = this.state.moves.length % 2 ? BLACK_SIDE : WHITE_SIDE;
       this.methods.calculateAvailableMoves();
       this.methods.chessBotChooseMove();
+
+      if (this.state.turn === BLACK_SIDE && this.state.chessBot) {
+        console.log(this.state.chessBot.name + ' is moving...');
+        this.methods.chessBotMove();
+      }
     }
 
     return this.actions.cloneState();
@@ -471,10 +499,32 @@ function chessBoardEngineFn()
     return this.actions.cloneState();
   }
 
+  function chessBotMove() {
+    if (this.state.chessBot && this.state.turn === BLACK_SIDE && this.state.chessBotNextMove) {
+      this.actions.move(this.state.chessBotNextMove.from, this.state.chessBotNextMove.to);
+    }
+  }
+
   function chessBotChooseMove() {
-    if (this.state.availableMoves && this.state.availableMoves.length) {
-      var idx = Math.floor(Math.random() * this.state.availableMoves.length);
-      this.state.chessBotNextMove = this.state.availableMoves[idx];
+    var bot = this.state.chessBot;
+    var moves = this.state.availableMoves;
+    if (bot && moves && moves.length) {
+      var settings = bot.settings;
+      if (settings.preferTake) {
+        var takeMoves = moves.filter((m) => m.taken);
+        if (takeMoves && takeMoves.length) {
+          moves = takeMoves;
+
+          if (settings.takeMostValue) {
+            moves.sort((a,b) => b.taken.piece.value - a.taken.piece.value);
+            this.state.chessBotNextMove = moves[0];
+            return;
+          }
+        }
+      }
+
+      var idx = Math.floor(Math.random() * moves.length);
+      this.state.chessBotNextMove = moves[idx];
     } else {
       this.state.chessBotNextMove = undefined;
     }

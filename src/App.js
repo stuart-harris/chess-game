@@ -48,6 +48,10 @@ class App extends Component {
     this.setState(this.engine.actions.start());
   }
 
+  onSelectBot(id) {
+    this.setState(this.engine.actions.selectBot(id));
+  }
+
   coordsToBoard(coords) {
     return { row: 8-coords.row, col: coords.col + 1};
   }
@@ -178,28 +182,28 @@ class App extends Component {
       if (value.isPlaying) {
         chessBotPanel = <div>
           <p>You are playing {value.chessBot.name}</p>
-          <p>{value.chessBot.description}</p>
+          <p className="description">{value.chessBot.description}</p>
           <p>What would {value.chessBot.name} do?</p>
           <p>{formatMove(value.chessBotNextMove)}</p>
         </div>  
       } else {
         chessBotPanel = <div>
           <p>You selected {value.chessBot.name}</p>
-          <p>{value.chessBot.description}</p>
+          <p className="description">{value.chessBot.description}</p>
         </div>
       }
     } else if (!value.isPlaying) {
       chessBotPanel = <div>
         <p>Choose a chess bot</p>
-        <dl>
+        <div>
         {
           value.chessBots.map((cb, i, cbs) =>
-          <div style={{marginBottom: 10}}>
-            <dt>{cb.name}</dt>
-            <dd>{cb.description}</dd>
-          </div>)
+          <button key={"btn-cb-" + cb.id} onClick={() => this.onSelectBot(cb.id)} className="full-width" style={{marginBottom: 10}}>
+            <p>{cb.name}</p>
+            <p className="description">{cb.description}</p>
+          </button>)
         }
-        </dl>
+        </div>
       </div>
     }
 

@@ -65,6 +65,19 @@ button.btn-primary {
   color: rgb(255, 243, 221);
 }
 
+.full-width {
+  width: 100%;
+}
+
+button p {
+  margin: 0;
+  width: 100%;
+}
+
+.description {
+  font-weight: normal;
+  font-size: smaller;
+}
 
 .center {
   text-align: center;
