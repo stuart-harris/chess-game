@@ -169,7 +169,39 @@ class App extends Component {
     const availableMovesPanel = 
         value.availableMoves.map((m, i, ms) => 
         <div key={"am-" + i}>{formatMove(m)}</div>
-      )  
+      )
+
+
+    let chessBotPanel;
+
+    if (value.chessBot) {
+      if (value.isPlaying) {
+        chessBotPanel = <div>
+          <p>You are playing {value.chessBot.name}</p>
+          <p>{value.chessBot.description}</p>
+          <p>What would {value.chessBot.name} do?</p>
+          <p>{formatMove(value.chessBotNextMove)}</p>
+        </div>  
+      } else {
+        chessBotPanel = <div>
+          <p>You selected {value.chessBot.name}</p>
+          <p>{value.chessBot.description}</p>
+        </div>
+      }
+    } else if (!value.isPlaying) {
+      chessBotPanel = <div>
+        <p>Choose a chess bot</p>
+        <dl>
+        {
+          value.chessBots.map((cb, i, cbs) =>
+          <div style={{marginBottom: 10}}>
+            <dt>{cb.name}</dt>
+            <dd>{cb.description}</dd>
+          </div>)
+        }
+        </dl>
+      </div>
+    }
 
     return (
       <div className="App">
@@ -229,8 +261,7 @@ class App extends Component {
                 {availableMovesPanel}
               </div>
               <div className="column-3">
-                <p>What would {value.chessBot} do?</p>
-                <p>{formatMove(value.chessBotNextMove)}</p>
+                {chessBotPanel}
               </div>
               <div className="column-6">
               </div>

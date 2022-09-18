@@ -71,14 +71,35 @@ function chessBoardEngineFn()
 {
   var obj = {
     state: {
+      isPlaying: false,
       selected: "",
       fromLocation: "",
       pieces: [],
       turn: "",
       moves: [],
       availableMoves: [],
-      chessBot: "Snizzle-smark",
-      chessBotNextMove: undefined
+      chessBot: undefined,
+      chessBotNextMove: undefined,
+      chessBots: [{
+        name: "Snizzle-smark",
+        description: "Completely random.",
+        settings: {
+          preferTake: false,
+          takeMostValue: false,
+          avoidSacrifice: false,
+          protectThreatened: false
+        }
+      },{
+        name: "Takarmada",
+        description: "Will try to take everything.",
+        settings: {
+          preferTake: true,
+          takeMostValue: false,
+          avoidSacrifice: false,
+          protectThreatened: false
+        }
+      }
+      ]
     }
   };
 
@@ -147,6 +168,8 @@ function chessBoardEngineFn()
 
   function clear() {
     console.log("clear()");
+    this.state.isPlaying = false;
+    this.chessBot = undefined;
     this.state.selected = "";
     this.state.pieces = [];
     this.state.moves = [];
@@ -157,6 +180,8 @@ function chessBoardEngineFn()
 
   function reset() {
     console.log("reset()");
+    this.state.isPlaying = false;
+    this.chessBot = undefined;
     this.state.selected = "";
     this.state.moves = [];
     this.state.availableMoves = [];
@@ -167,6 +192,7 @@ function chessBoardEngineFn()
 
   function start() {
     console.log("start()");
+    this.state.isPlaying = true;
     this.state.selected = "";
     this.state.moves = [];
     this.state.availableMoves = [];
