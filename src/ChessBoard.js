@@ -127,8 +127,8 @@ function chessBoardEngineFn()
   }
 
   obj.methods = {
-    textToLocation: textToLocation.bind(obj),
-    locationToText: locationToText.bind(obj),
+    textToCoord: textToCoord.bind(obj),
+    coordToText: coordToText.bind(obj),
     isPieceAt: isPieceAt.bind(obj),
     isBlocked: isBlocked.bind(obj),
     canMove: canMove.bind(obj),
@@ -151,10 +151,10 @@ function chessBoardEngineFn()
   return obj;
 
   /**
-   * Convert a1 to { row: 0, col: 0 }, a2 to { row: 1, col: 0 }
+   * Convert a1 to { row: 1, col: 1 }, a2 to { row: 2, col: 1 }
    * @param {*} t text
    */
-  function textToLocation(t) {
+  function textToCoord(t) {
     const aVal = "a".charCodeAt(0);
 
     if (!t || t.length != 2) return;
@@ -165,11 +165,11 @@ function chessBoardEngineFn()
     return { row: r, col: c};
   }
 
-  /** if r=2, c=3, returns d3 (c=3=>d, r=2=>3 1 based)
-   * row: integer, 0-7
-   * col: integer, 0-7
+  /** if r=2, c=4, returns d2 (c=4=>d, r=2=>2 1 based)
+   * row: integer, 1-8
+   * col: integer, 1-8
    */
-  function locationToText(row, col) {
+  function coordToText(row, col) {
     const aVal = "a".charCodeAt(0);
     return String.fromCharCode(aVal + col - 1) + (row).toString();
 
@@ -257,7 +257,7 @@ function chessBoardEngineFn()
 
     if (toCoord.col === 3) {
       // rook location
-      var rookLocn = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 1);
+      var rookLocn = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 1);
       // is the rook there?
       var rook = pieces.find(p =>
         p.piece.piece === PIECE_ROOK &&
@@ -268,16 +268,16 @@ function chessBoardEngineFn()
       if (!rook) return false;
 
       // is there space?
-      var l1 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 2);
-      var l2 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 3);
-      var l3 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 4);
+      var l1 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 2);
+      var l2 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 3);
+      var l3 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 4);
       var noSpace = pieces.some(p => p.location === l1 || p.location === l2 || p.location === l3)
       // are there threats?
       // TODO var threads = 
       return !noSpace;
     } else {
       // rook location
-      var rookLocn = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 8);
+      var rookLocn = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 8);
       // is the rook there?
       var rook = pieces.find(p =>
         p.piece.piece === PIECE_ROOK &&
@@ -288,8 +288,8 @@ function chessBoardEngineFn()
       if (!rook) return false;
 
       // is there space?
-      var l1 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 6);
-      var l2 = locationToText(king.piece.side === WHITE_SIDE ? 1 : 8, 7);
+      var l1 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 6);
+      var l2 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 7);
       var noSpace = pieces.some(p => p.location === l1 || p.location === l2)
       // are there threats?
       // TODO var threads = 
@@ -301,11 +301,11 @@ function chessBoardEngineFn()
 
   function castleMoveRook(king, pieces, toCoord) {
     // rook location
-    var rookLocn = locationToText(
+    var rookLocn = coordToText(
       king.piece.side === WHITE_SIDE ? 1 : 8,
       toCoord.col === 3 ? 1 : 8);
 
-    var rookToLocn = locationToText(
+    var rookToLocn = coordToText(
       king.piece.side === WHITE_SIDE ? 1 : 8,
       toCoord.col === 3 ? 4 : 6);
 
@@ -346,19 +346,19 @@ function chessBoardEngineFn()
   }
 
   function getPieceAtLocation(coord) {
-    var locn = locationToText(coord.row, coord.col);
+    var locn = coordToText(coord.row, coord.col);
     return this.state.pieces.find(p => p.location === locn);
   }
 
   function isPieceAt(row, col) {
-    var locn = locationToText(row, col);
+    var locn = coordToText(row, col);
     var result = this.state.pieces.some(p => p.location === locn);
     //console.log('isPieceAt("' + locn + '"): ' + result)
     return result;
   }
 
   function getPieceAt(pieces, coord) {
-    var locn = locationToText(coord.row, coord.col);
+    var locn = coordToText(coord.row, coord.col);
     return pieces.find(p => p.location === locn);
   }
 
@@ -395,7 +395,7 @@ function chessBoardEngineFn()
   function isThreatened(movingPiece, coord) {
     var othSide = otherSide(movingPiece.piece.side);
     var sidePieces = this.methods.getSidePieces(othSide);
-    return sidePieces.some(p => p.location && this.methods.canMove(p, this.methods.textToLocation(p.location), coord, movingPiece, true));
+    return sidePieces.some(p => p.location && this.methods.canMove(p, this.methods.textToCoord(p.location), coord, movingPiece, true));
   }
 
   function canMove(piece, fromCoord, toCoord, takenPiece, isThreat) {
@@ -429,8 +429,8 @@ function chessBoardEngineFn()
     // find the piece
     var piece = this.state.pieces.find(p => p.location === fromLocn);
     var takenPiece = this.state.pieces.find(p => p.location === toLocn);
-    var fromCoord = this.methods.textToLocation(fromLocn);
-    var toCoord = this.methods.textToLocation(toLocn);
+    var fromCoord = this.methods.textToCoord(fromLocn);
+    var toCoord = this.methods.textToCoord(toLocn);
     var pieceCanMove = this.methods.canMove(piece, fromCoord, toCoord, takenPiece);
 
     if (!pieceCanMove) {
@@ -542,7 +542,7 @@ function chessBoardEngineFn()
 
     for(var i = 0; i < pieces.length; i++) {
       var p = pieces[i];
-      var coord = textToLocation(p.location);
+      var coord = textToCoord(p.location);
       moves.push(...this.methods.calculateAvailableMovesForPiece(p, coord, piecesOnBoard));
     }
     this.state.availableMoves = moves;
@@ -752,8 +752,8 @@ function chessBoardEngineFn()
     return {
       piece: piece.piece,
       taken: takenPiece,
-      from: locationToText(fromCoord.row, fromCoord.col),
-      to: locationToText(toCoord.row, toCoord.col)
+      from: coordToText(fromCoord.row, fromCoord.col),
+      to: coordToText(toCoord.row, toCoord.col)
     }
   }
 

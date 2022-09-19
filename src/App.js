@@ -24,11 +24,9 @@ class App extends Component {
       [{},{},{},{},{},{},{},{}]
     ];
 
-    const aVal = "a".charCodeAt(0);
-
     for(let i = 0; i < pieces.length; i++) {
       let p = pieces[i];
-      var coord = this.engine.methods.textToLocation(p.location);
+      var coord = this.engine.methods.textToCoord(p.location);
       if (!coord) continue;
       board[8-coord.row][coord.col-1] = p.piece;
     }
@@ -62,7 +60,7 @@ class App extends Component {
 
   selectPiece(r, c) {
     var bCoords = this.coordsToBoard({row: r, col: c});
-    var locn = this.engine.methods.locationToText(bCoords.row, bCoords.col);
+    var locn = this.engine.methods.coordToText(bCoords.row, bCoords.col);
     console.log('selectPiece(' + r + ', ' + c + '): ' + locn);
     // TODO: Use redux to dispatch a call to select a piece
     this.setState(this.engine.actions.selectPiece(locn));
@@ -80,7 +78,7 @@ class App extends Component {
     }
 
     var bCoords = this.coordsToBoard({row: r, col: c});
-    var locn = this.engine.methods.locationToText(bCoords.row, bCoords.col);
+    var locn = this.engine.methods.coordToText(bCoords.row, bCoords.col);
 
     if (this.state.selected) {
       result.push(locn === this.state.selected ? 'selected' : 'selectable');
