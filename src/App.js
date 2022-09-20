@@ -3,6 +3,36 @@ import { Component } from 'react';
 import './App.css';
 import chessBoardEngine from './ChessBoard'
 
+/**
+ * Convert a1 to { row: 1, col: 1 }, a2 to { row: 2, col: 1 }
+ * @param {*} t text
+ */
+ function textToCoord(t) {
+  const aVal = "a".charCodeAt(0);
+
+  if (!t || t.length != 2) return;
+  let c = t.charCodeAt(0) - aVal + 1;
+  if (c < 1 || c > 8) return;
+  let r = parseInt(t.charAt(1));
+  if (r < 1 || r > 8) return;
+  return { row: r, col: c};
+}
+
+/** if r=2, c=4, returns d2 (c=4=>d, r=2=>2 1 based)
+ * row: integer, 1-8
+ * col: integer, 1-8
+ */
+function coordToText(coord) {
+  const aVal = "a".charCodeAt(0);
+  return String.fromCharCode(aVal + coord.col - 1) + (coord.row).toString();
+
+}
+
+function isEqualCoord(a, b) {
+  return a.row === b.row && a.col === b.col; 
+}
+
+
 class App extends Component {
   engine = chessBoardEngine.createEngine()
   state = this.engine.state
@@ -26,7 +56,7 @@ class App extends Component {
 
     for(let i = 0; i < pieces.length; i++) {
       let p = pieces[i];
-      var coord = this.engine.methods.textToCoord(p.location);
+      var coord = p.location;
       if (!coord) continue;
       board[8-coord.row][coord.col-1] = p.piece;
     }
@@ -58,12 +88,25 @@ class App extends Component {
     return { row: 8-coords.row, col: coords.col - 1};
   }
 
+  makeCoord(r, c) {
+    return {row: r, col: c};
+  }
+
+  isEqualCoord(a, b) {
+    return a.row === b.row && a.col === b.col; 
+  }
+
   selectPiece(r, c) {
-    var bCoords = this.coordsToBoard({row: r, col: c});
-    var locn = this.engine.methods.coordToText(bCoords.row, bCoords.col);
-    console.log('selectPiece(' + r + ', ' + c + '): ' + locn);
-    // TODO: Use redux to dispatch a call to select a piece
+    var bCoords = this.coordsToBoard(this.makeCoord(r, c));
+    var locn = this.makeCoord(bCoords.row, bCoords.col);
+    console.log('selectPiece(' + r + ', ' + c + '): ' + coordToText(locn));
     this.setState(this.engine.actions.selectPiece(locn));
+
+    // if (this.state.chessBot && this.state.turn === "Black") {
+    //   var botMove = this.engine.methods.chessBotMove();
+    //   var setStateFn = this.setState;
+    //   setTimeout(() => setStateFn(botMove()), 1000);
+    // } 
   }
 
   getPieceClasses(r, c, piece) {
@@ -77,11 +120,11 @@ class App extends Component {
       result.push('turn');
     }
 
-    var bCoords = this.coordsToBoard({row: r, col: c});
-    var locn = this.engine.methods.coordToText(bCoords.row, bCoords.col);
+    var locn = this.coordsToBoard(this.makeCoord(r,c));
+//    var locn = this.engine.methods.coordToText(bCoords.row, bCoords.col);
 
     if (this.state.selected) {
-      result.push(locn === this.state.selected ? 'selected' : 'selectable');
+      result.push(isEqualCoord(locn, this.state.selected) ? 'selected' : 'selectable');
     }
 
     if (this.state.fromLocation === locn) {
@@ -146,7 +189,11 @@ class App extends Component {
 
     function formatMove(move) {
       // console.log(move);
-      if(move) return move.piece.piece + move.from + (move.taken ? "x" : " ") + move.to;
+      if(move) return move.piece.piece +
+        coordToText(move.from) +
+        (move.taken ? "x" : " ") +
+        coordToText(move.to);
+
       return "-";
     }
 

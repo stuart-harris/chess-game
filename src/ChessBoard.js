@@ -19,39 +19,75 @@ const BLACK_KNIGHT = { piece: PIECE_KNIGHT, value: 3, text: "&#x265E;", side: BL
 const BLACK_ROOK = { piece: PIECE_ROOK, value: 5, text: "&#x265C;", side: BLACK_SIDE};
 const BLACK_PAWN = { piece: PIECE_PAWN, value: 1, text: "&#x265F;", side: BLACK_SIDE};
 const STARTING_PIECES = [
-  { piece: WHITE_KING, location: "e1"},
-  { piece: WHITE_QUEEN, location: "d1"},
-  { piece: WHITE_BISHOP, location: "c1"},
-  { piece: WHITE_BISHOP, location: "f1"},
-  { piece: WHITE_KNIGHT, location: "b1"},
-  { piece: WHITE_KNIGHT, location: "g1"},
-  { piece: WHITE_ROOK, location: "a1"},
-  { piece: WHITE_ROOK, location: "h1"},
-  { piece: WHITE_PAWN, location: "a2"},
-  { piece: WHITE_PAWN, location: "b2"},
-  { piece: WHITE_PAWN, location: "c2"},
-  { piece: WHITE_PAWN, location: "d2"},
-  { piece: WHITE_PAWN, location: "e2"},
-  { piece: WHITE_PAWN, location: "f2"},
-  { piece: WHITE_PAWN, location: "g2"},
-  { piece: WHITE_PAWN, location: "h2"},
-  { piece: BLACK_KING, location: "e8"},
-  { piece: BLACK_QUEEN, location: "d8"},
-  { piece: BLACK_BISHOP, location: "c8"},
-  { piece: BLACK_BISHOP, location: "f8"},
-  { piece: BLACK_KNIGHT, location: "b8"},
-  { piece: BLACK_KNIGHT, location: "g8"},
-  { piece: BLACK_ROOK, location: "a8"},
-  { piece: BLACK_ROOK, location: "h8"},
-  { piece: BLACK_PAWN, location: "a7"},
-  { piece: BLACK_PAWN, location: "b7"},
-  { piece: BLACK_PAWN, location: "c7"},
-  { piece: BLACK_PAWN, location: "d7"},
-  { piece: BLACK_PAWN, location: "e7"},
-  { piece: BLACK_PAWN, location: "f7"},
-  { piece: BLACK_PAWN, location: "g7"},
-  { piece: BLACK_PAWN, location: "h7"},
+  { piece: WHITE_KING, location: textToCoord("e1")},
+  { piece: WHITE_QUEEN, location: textToCoord("d1")},
+  { piece: WHITE_BISHOP, location: textToCoord("c1")},
+  { piece: WHITE_BISHOP, location: textToCoord("f1")},
+  { piece: WHITE_KNIGHT, location: textToCoord("b1")},
+  { piece: WHITE_KNIGHT, location: textToCoord("g1")},
+  { piece: WHITE_ROOK, location: textToCoord("a1")},
+  { piece: WHITE_ROOK, location: textToCoord("h1")},
+  { piece: WHITE_PAWN, location: textToCoord("a2")},
+  { piece: WHITE_PAWN, location: textToCoord("b2")},
+  { piece: WHITE_PAWN, location: textToCoord("c2")},
+  { piece: WHITE_PAWN, location: textToCoord("d2")},
+  { piece: WHITE_PAWN, location: textToCoord("e2")},
+  { piece: WHITE_PAWN, location: textToCoord("f2")},
+  { piece: WHITE_PAWN, location: textToCoord("g2")},
+  { piece: WHITE_PAWN, location: textToCoord("h2")},
+  { piece: BLACK_KING, location: textToCoord("e8")},
+  { piece: BLACK_QUEEN, location: textToCoord("d8")},
+  { piece: BLACK_BISHOP, location: textToCoord("c8")},
+  { piece: BLACK_BISHOP, location: textToCoord("f8")},
+  { piece: BLACK_KNIGHT, location: textToCoord("b8")},
+  { piece: BLACK_KNIGHT, location: textToCoord("g8")},
+  { piece: BLACK_ROOK, location: textToCoord("a8")},
+  { piece: BLACK_ROOK, location: textToCoord("h8")},
+  { piece: BLACK_PAWN, location: textToCoord("a7")},
+  { piece: BLACK_PAWN, location: textToCoord("b7")},
+  { piece: BLACK_PAWN, location: textToCoord("c7")},
+  { piece: BLACK_PAWN, location: textToCoord("d7")},
+  { piece: BLACK_PAWN, location: textToCoord("e7")},
+  { piece: BLACK_PAWN, location: textToCoord("f7")},
+  { piece: BLACK_PAWN, location: textToCoord("g7")},
+  { piece: BLACK_PAWN, location: textToCoord("h7")},
 ];
+
+
+function makeCoord(r, c) {
+  return { row: r, col: c};
+}
+
+function isEqualCoord(a, b) {
+  return a.row === b.row && a.col === b.col; 
+}
+
+/**
+ * Convert a1 to { row: 1, col: 1 }, a2 to { row: 2, col: 1 }
+ * @param {*} t text
+ */
+function textToCoord(t) {
+  const aVal = "a".charCodeAt(0);
+
+  if (!t || t.length != 2) return;
+  let c = t.charCodeAt(0) - aVal + 1;
+  if (c < 1 || c > 8) return;
+  let r = parseInt(t.charAt(1));
+  if (r < 1 || r > 8) return;
+  return { row: r, col: c};
+}
+
+/** if r=2, c=4, returns d2 (c=4=>d, r=2=>2 1 based)
+ * row: integer, 1-8
+ * col: integer, 1-8
+ */
+function coordToText(coord) {
+  const aVal = "a".charCodeAt(0);
+  return String.fromCharCode(aVal + coord.col - 1) + (coord.row).toString();
+
+}
+
+
 
 /*
 move: {
@@ -150,31 +186,6 @@ function chessBoardEngineFn()
 
   return obj;
 
-  /**
-   * Convert a1 to { row: 1, col: 1 }, a2 to { row: 2, col: 1 }
-   * @param {*} t text
-   */
-  function textToCoord(t) {
-    const aVal = "a".charCodeAt(0);
-
-    if (!t || t.length != 2) return;
-    let c = t.charCodeAt(0) - aVal + 1;
-    if (c < 1 || c > 8) return;
-    let r = parseInt(t.charAt(1));
-    if (r < 1 || r > 8) return;
-    return { row: r, col: c};
-  }
-
-  /** if r=2, c=4, returns d2 (c=4=>d, r=2=>2 1 based)
-   * row: integer, 1-8
-   * col: integer, 1-8
-   */
-  function coordToText(row, col) {
-    const aVal = "a".charCodeAt(0);
-    return String.fromCharCode(aVal + col - 1) + (row).toString();
-
-  }
-
   function cloneState() {
     this.state = Object.assign({}, this.state);
     return this.state;
@@ -242,12 +253,8 @@ function chessBoardEngineFn()
     return coord.row > 0 && coord.row < 9 && coord.col > 0 && coord.col < 9;
   }
 
-  function isEqual(fromCoord, toCoord) {
-    return fromCoord.row === toCoord.row && fromCoord.col === toCoord.col; 
-  }
-
   function isOneSquare(fromCoord, toCoord) {
-    return !isEqual(fromCoord, toCoord) &&
+    return !isEqualCoord(fromCoord, toCoord) &&
       Math.abs(fromCoord.row - toCoord.row) < 2 &&
       Math.abs(fromCoord.col - toCoord.col) < 2;
   }
@@ -257,7 +264,7 @@ function chessBoardEngineFn()
 
     if (toCoord.col === 3) {
       // rook location
-      var rookLocn = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 1);
+      var rookLocn = coordToText(makeCoord(king.piece.side === WHITE_SIDE ? 1 : 8, 1));
       // is the rook there?
       var rook = pieces.find(p =>
         p.piece.piece === PIECE_ROOK &&
@@ -268,16 +275,16 @@ function chessBoardEngineFn()
       if (!rook) return false;
 
       // is there space?
-      var l1 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 2);
-      var l2 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 3);
-      var l3 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 4);
-      var noSpace = pieces.some(p => p.location === l1 || p.location === l2 || p.location === l3)
+      var l1 = makeCoord(king.piece.side === WHITE_SIDE ? 1 : 8, 2);
+      var l2 = makeCoord(king.piece.side === WHITE_SIDE ? 1 : 8, 3);
+      var l3 = makeCoord(king.piece.side === WHITE_SIDE ? 1 : 8, 4);
+      var noSpace = pieces.some(p => isEqualCoord(p.location, l1) || isEqualCoord(p.location, l2) || isEqualCoord(p.location, l3))
       // are there threats?
       // TODO var threads = 
       return !noSpace;
     } else {
       // rook location
-      var rookLocn = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 8);
+      var rookLocn = coordToText(makeCoord(king.piece.side === WHITE_SIDE ? 1 : 8, 8));
       // is the rook there?
       var rook = pieces.find(p =>
         p.piece.piece === PIECE_ROOK &&
@@ -288,9 +295,9 @@ function chessBoardEngineFn()
       if (!rook) return false;
 
       // is there space?
-      var l1 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 6);
-      var l2 = coordToText(king.piece.side === WHITE_SIDE ? 1 : 8, 7);
-      var noSpace = pieces.some(p => p.location === l1 || p.location === l2)
+      var l1 = makeCoord(king.piece.side === WHITE_SIDE ? 1 : 8, 6);
+      var l2 = makeCoord(king.piece.side === WHITE_SIDE ? 1 : 8, 7);
+      var noSpace = pieces.some(p => isEqualCoord(p.location, l1) || isEqualCoord(p.location, l2))
       // are there threats?
       // TODO var threads = 
       return !noSpace;
@@ -301,11 +308,11 @@ function chessBoardEngineFn()
 
   function castleMoveRook(king, pieces, toCoord) {
     // rook location
-    var rookLocn = coordToText(
+    var rookLocn = makeCoord(
       king.piece.side === WHITE_SIDE ? 1 : 8,
       toCoord.col === 3 ? 1 : 8);
 
-    var rookToLocn = coordToText(
+    var rookToLocn = makeCoord(
       king.piece.side === WHITE_SIDE ? 1 : 8,
       toCoord.col === 3 ? 4 : 6);
 
@@ -314,7 +321,7 @@ function chessBoardEngineFn()
       p.piece.piece === PIECE_ROOK &&
       p.piece.side === king.piece.side &&
       !p.moved &&
-      p.location === rookLocn);
+      isEqualCoord(p.location, rookLocn));
 
     if (rook) {
       rook.location = rookToLocn;
@@ -346,20 +353,18 @@ function chessBoardEngineFn()
   }
 
   function getPieceAtLocation(coord) {
-    var locn = coordToText(coord.row, coord.col);
-    return this.state.pieces.find(p => p.location === locn);
+    return this.state.pieces.find(p => isEqualCoord(p.location, coord));
   }
 
   function isPieceAt(row, col) {
-    var locn = coordToText(row, col);
-    var result = this.state.pieces.some(p => p.location === locn);
+    var locn = makeCoord(row, col);
+    var result = this.state.pieces.some(p => isEqualCoord(p.location, locn));
     //console.log('isPieceAt("' + locn + '"): ' + result)
     return result;
   }
 
   function getPieceAt(pieces, coord) {
-    var locn = coordToText(coord.row, coord.col);
-    return pieces.find(p => p.location === locn);
+    return pieces.find(p => isEqualCoord(p.location, coord));
   }
 
   function isValidCoord(coord) {
@@ -395,7 +400,7 @@ function chessBoardEngineFn()
   function isThreatened(movingPiece, coord) {
     var othSide = otherSide(movingPiece.piece.side);
     var sidePieces = this.methods.getSidePieces(othSide);
-    return sidePieces.some(p => p.location && this.methods.canMove(p, this.methods.textToCoord(p.location), coord, movingPiece, true));
+    return sidePieces.some(p => p.location && this.methods.canMove(p, p.location, coord, movingPiece, true));
   }
 
   function canMove(piece, fromCoord, toCoord, takenPiece, isThreat) {
@@ -427,10 +432,12 @@ function chessBoardEngineFn()
 
   function move(fromLocn, toLocn) {
     // find the piece
-    var piece = this.state.pieces.find(p => p.location === fromLocn);
-    var takenPiece = this.state.pieces.find(p => p.location === toLocn);
-    var fromCoord = this.methods.textToCoord(fromLocn);
-    var toCoord = this.methods.textToCoord(toLocn);
+    var piece = this.state.pieces.find(p => isEqualCoord(p.location, fromLocn));
+    var takenPiece = this.state.pieces.find(p => isEqualCoord(p.location, toLocn));
+//    var fromCoord = this.methods.textToCoord(fromLocn);
+//    var toCoord = this.methods.textToCoord(toLocn);
+    var fromCoord = fromLocn;
+    var toCoord = toLocn;
     var pieceCanMove = this.methods.canMove(piece, fromCoord, toCoord, takenPiece);
 
     if (!pieceCanMove) {
@@ -444,7 +451,7 @@ function chessBoardEngineFn()
         return this.actions.cloneState();
       }
       // taking a piece
-      takenPiece.location = "";
+      takenPiece.location = null;
     }
 
     if (piece) {
@@ -479,19 +486,18 @@ function chessBoardEngineFn()
   }
   function selectPiece(location) {
     if (this.state.selected) {
-      console.log("selectPiece() second selection: " + location)
-      if (this.state.selected !== location) {
-        // remove selection
+      console.log("selectPiece() second selection: " + coordToText(location))
+      if (!isEqualCoord(this.state.selected, location)) {
         this.actions.move(this.state.selected, location);
       }
       // remove selection
-      this.state.selected = "";
+      this.state.selected = null;
     } else {
-      var p = this.state.pieces.find(p => p.location === location);
+      var p = this.state.pieces.find(p => isEqualCoord(p.location, location));
       if (p && p.piece.side === this.state.turn) {
-        console.log("selectPiece() first selection: " + location)
+        console.log("selectPiece() first selection: " + coordToText(location))
         this.state.selected = location;
-        this.state.fromLocation = "";
+        this.state.fromLocation = null;
       } else {
         console.log("selectPiece() Not your turn");
       }
@@ -542,8 +548,7 @@ function chessBoardEngineFn()
 
     for(var i = 0; i < pieces.length; i++) {
       var p = pieces[i];
-      var coord = textToCoord(p.location);
-      moves.push(...this.methods.calculateAvailableMovesForPiece(p, coord, piecesOnBoard));
+      moves.push(...this.methods.calculateAvailableMovesForPiece(p, p.location, piecesOnBoard));
     }
     this.state.availableMoves = moves;
     console.log('available moves : ', moves);
@@ -752,8 +757,8 @@ function chessBoardEngineFn()
     return {
       piece: piece.piece,
       taken: takenPiece,
-      from: coordToText(fromCoord.row, fromCoord.col),
-      to: coordToText(toCoord.row, toCoord.col)
+      from: makeCoord(fromCoord.row, fromCoord.col),
+      to: makeCoord(toCoord.row, toCoord.col)
     }
   }
 
