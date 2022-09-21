@@ -35,13 +35,13 @@ A chess game with a chess engine
 * Available moves - castle [ ]
 * Available moves - restrict if move would be in check [ ]
 * Chessbot v1 random moves &check;
-* Make Chessbot play [ ]
+* Make Chessbot play &check;
 * Restrict king movement by threats &check;
 * Restrict piece movement by pinning [ ]
 * Identify check [ ]
 * Identify checkmate [ ]
 * Chessbot v2 avoid threats [ ]
-* Chessbot v3 prefer attacks [ ]
+* Chessbot v3 prefer attacks &check;
 * Chessbot v4 prefer checks [ ]
 * Chessbot v5 prefer checkmate [ ]
 * Chessbot v6 learn - record database [ ]

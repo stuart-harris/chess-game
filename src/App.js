@@ -29,7 +29,7 @@ function coordToText(coord) {
 }
 
 function isEqualCoord(a, b) {
-  return a.row === b.row && a.col === b.col; 
+  return (!a && !b) || (a && b && a.row === b.row && a.col === b.col); 
 }
 
 
