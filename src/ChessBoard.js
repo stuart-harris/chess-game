@@ -318,6 +318,7 @@ function chessBoardEngineFn()
   function canMove(piece, fromCoord, toCoord, takenPiece, isThreat) {
     if (!piece || !piece.piece || !piece.piece.piece) return false;
     if (!isValidLocation(fromCoord) || !isValidLocation(toCoord)) return false;
+    if (takenPiece && takenPiece.piece.piece === ChessPiece.PIECE_KING) return false;
 
     if (piece.piece.piece === ChessPiece.PIECE_KING) {
       return this.methods.isKingMove(piece, this.state.pieces, fromCoord, toCoord);
@@ -467,26 +468,50 @@ function chessBoardEngineFn()
   }
 
   function calculateAvailableMovesForPiece(piece, coord, pieces) {
+    var moves = [];
     if (piece.piece.piece === ChessPiece.PIECE_PAWN) {
-      return this.methods.calculateAvailableMovesForPawn(piece, coord, pieces);
+      moves = this.methods.calculateAvailableMovesForPawn(piece, coord, pieces);
     }
     if (piece.piece.piece === ChessPiece.PIECE_ROOK) {
-      return this.methods.calculateAvailableMovesForRook(piece, coord, pieces);
+      moves = this.methods.calculateAvailableMovesForRook(piece, coord, pieces);
     }
     if (piece.piece.piece === ChessPiece.PIECE_KNIGHT) {
-      return this.methods.calculateAvailableMovesForKnight(piece, coord, pieces);
+      moves = this.methods.calculateAvailableMovesForKnight(piece, coord, pieces);
     }
     if (piece.piece.piece === ChessPiece.PIECE_BISHOP) {
-      return this.methods.calculateAvailableMovesForBishop(piece, coord, pieces);
+      moves = this.methods.calculateAvailableMovesForBishop(piece, coord, pieces);
     }
     if (piece.piece.piece === ChessPiece.PIECE_QUEEN) {
-      return this.methods.calculateAvailableMovesForQueen(piece, coord, pieces);
+      moves = this.methods.calculateAvailableMovesForQueen(piece, coord, pieces);
     }
     if (piece.piece.piece === ChessPiece.PIECE_KING) {
-      return this.methods.calculateAvailableMovesForKing(piece, coord, pieces);
+      moves = this.methods.calculateAvailableMovesForKing(piece, coord, pieces);
     }
 
-    return [];
+    moves = removeInvalidMoves(moves);
+
+    return moves;
+  }
+
+  function removeInvalidMoves(moves) {
+    return moves.filter((m) => isValidMove(m));
+  }
+
+  function isValidMove(m) {
+    if (m.taken && m.taken.piece.piece === ChessPiece.PIECE_KING) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function makeMove(piece, takenPiece, fromCoord, toCoord) {
+    return {
+      piece: piece.piece,
+      taken: takenPiece,
+      from: makeCoord(fromCoord.row, fromCoord.col),
+      to: makeCoord(toCoord.row, toCoord.col)
+    }
   }
 
   function calculateAvailableMovesForBishop(piece, coord, pieces, distanceLimit) {
@@ -663,15 +688,6 @@ function chessBoardEngineFn()
     // TODO: en passant
 
     return moves;
-  }
-
-  function makeMove(piece, takenPiece, fromCoord, toCoord) {
-    return {
-      piece: piece.piece,
-      taken: takenPiece,
-      from: makeCoord(fromCoord.row, fromCoord.col),
-      to: makeCoord(toCoord.row, toCoord.col)
-    }
   }
 
 }
