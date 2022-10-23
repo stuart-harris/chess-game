@@ -48,6 +48,6 @@ A chess game with a chess engine
 
 ## Site
 * <input type="checkbox" checked /> Add router
-* <input type="checkbox"> Add layout and start page
+* <input type="checkbox" checked /> Add layout and start page
 * <input type="checkbox"> Add page to select game settings, chessbot, player names, etc
 * <input type="checkbox"> Retain state between pages
