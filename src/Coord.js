@@ -29,4 +29,36 @@ export function coordToText(coord) {
     const aVal = "a".charCodeAt(0);
     return String.fromCharCode(aVal + coord.col - 1) + (coord.row).toString();
   
-}  
+} 
+
+export class Coord {
+    static empty = new Coord(0, 0);
+    row = 0;
+    col = 0;
+
+    constructor(row, col) {
+        this.row = row;
+        this.col = col;
+    }
+
+    static fromText(text) {
+        var obj = textToCoord(text);
+        return new Coord(obj.row, obj.col);
+    }
+
+    clone() {
+        return new Coord(this.row, this.col);
+    }
+
+    move(dr, dc) {
+        this.row += dr;
+        this.col += dc;
+    }
+
+    isValid() {
+        return this.row > 0 &&
+            this.row < 9 &&
+            this.col > 0 &&
+            this.col < 9;
+    }
+}

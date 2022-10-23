@@ -1,11 +1,11 @@
 import React from 'react';
 import { Component } from 'react';
 import './App.css';
-import chessBoardEngine from './ChessBoard'
+import chessBoard from './ChessBoard'
 import { coordToText, isEqualCoord } from './Coord.js';
 
 class App extends Component {
-  engine = chessBoardEngine.createEngine()
+  engine = chessBoard.createBoard()
   state = this.engine.state
 
   constructor(props) {

@@ -1,14 +1,26 @@
 import React from 'react';
-import { createRoot } from 'react-dom/client';
+import ReactDOM from 'react-dom/client';
+import {
+  BrowserRouter,
+  Routes,
+  Route
+} from "react-router-dom";
 import './index.css';
 import App from './App';
 
-const container = document.getElementById('root')
+// https://reactrouter.com/en/main/start/tutorial
+// Used this one: https://www.w3schools.com/react/react_router.asp
+// TODO: Put in layout and child routes
+export default function Root() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<App />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
-const root = createRoot(container)
+const root = ReactDOM.createRoot(document.getElementById("root"));
 
-root.render(
-  <App />,
-);
-
-
+root.render(<Root />);

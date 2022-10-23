@@ -9,8 +9,8 @@ move: {
   taken: WHITE_BISHOP
 }
 */
-var chessBoardEngine = {
-  createEngine() {
+var chessBoard = {
+  createBoard() {
     return chessBoardEngineFn();
   }
 };
@@ -692,4 +692,4 @@ function chessBoardEngineFn()
 
 }
 
-export default chessBoardEngine
+export default chessBoard

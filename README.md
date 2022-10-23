@@ -3,45 +3,51 @@ A chess game with a chess engine
 
 # Steps
 ## Drawing
-* Draw a board &check;
-* Draw pieces &check;
-* Taken piece display &check;
-* Show whose turn [ ]
+* <input type="checkbox" checked />  Draw a board 
+* <input type="checkbox" checked />  Draw pieces 
+* <input type="checkbox" checked />  Taken piece display 
+* <input type="checkbox" />  Show whose turn
 
 ## Moves
-* Click on pieces to move &check;
-* Basic piece movement (i.e. rook in straight line) &check;
-* Move history &check;
-* Correct format for move history [ ]
-* Blocking pieces restrict movement &check;
-* Pawn takes with en passant [ ]
-* Basic castling &check;
-* Restrict castling by blocking pieces &check;
-* Restrict castling by threatened squares [ ]
-* Enforce taking turns &check;
+* <input type="checkbox" checked />  Click on pieces to move 
+* <input type="checkbox" checked />  Basic piece movement (i.e. rook in straight line) 
+* <input type="checkbox" checked />  Move history 
+* <input type="checkbox" />  Correct format for move history
+* <input type="checkbox" checked />  Blocking pieces restrict movement 
+* <input type="checkbox" />  Pawn takes with en passant
+* <input type="checkbox" checked />  Basic castling 
+* <input type="checkbox" checked />  Restrict castling by blocking pieces 
+* <input type="checkbox" />  Restrict castling by threatened squares
+* <input type="checkbox" checked />  Enforce taking turns 
 
 ## Capture
-* Take pieces &check;
-* Restrict take pieces to other colour &check;
-* Is square threatened &check;
+* <input type="checkbox" checked />  Take pieces 
+* <input type="checkbox" checked />  Restrict take pieces to other colour 
+* <input type="checkbox" checked />  Is square threatened 
 
 ## Chess bot
-* Available moves - pawn &check;
-* Available moves - rook &check;
-* Available moves - knight &check;
-* Available moves - bishop &check;
-* Available moves - queen &check;
-* Available moves - king &check;
-* Available moves - castle [ ]
-* Available moves - restrict if move would be in check [ ]
-* Chessbot v1 random moves &check;
-* Make Chessbot play &check;
-* Restrict king movement by threats &check;
-* Restrict piece movement by pinning [ ]
-* Identify check [ ]
-* Identify checkmate [ ]
-* Chessbot v2 avoid threats [ ]
-* Chessbot v3 prefer attacks &check;
-* Chessbot v4 prefer checks [ ]
-* Chessbot v5 prefer checkmate [ ]
-* Chessbot v6 learn - record database [ ]
+* <input type="checkbox" checked />  Available moves - pawn 
+* <input type="checkbox" checked />  Available moves - rook 
+* <input type="checkbox" checked />  Available moves - knight 
+* <input type="checkbox" checked />  Available moves - bishop 
+* <input type="checkbox" checked />  Available moves - queen 
+* <input type="checkbox" checked />  Available moves - king 
+* <input type="checkbox" />  Available moves - castle
+* <input type="checkbox" />  Available moves - restrict if move would be in check
+* <input type="checkbox" checked />  Chessbot v1 random moves 
+* <input type="checkbox" checked />  Make Chessbot play 
+* <input type="checkbox" checked />  Restrict king movement by threats 
+* <input type="checkbox" />  Restrict piece movement by pinning
+* <input type="checkbox" />  Identify check
+* <input type="checkbox" />  Identify checkmate
+* <input type="checkbox" />  Chessbot v2 avoid threats
+* <input type="checkbox" checked />  Chessbot v3 prefer attacks 
+* <input type="checkbox" />  Chessbot v4 prefer checks
+* <input type="checkbox" />  Chessbot v5 prefer checkmate
+* <input type="checkbox" />  Chessbot v6 learn - record database
+
+## Site
+* <input type="checkbox" checked /> Add router
+* <input type="checkbox"> Add layout and start page
+* <input type="checkbox"> Add page to select game settings, chessbot, player names, etc
+* <input type="checkbox"> Retain state between pages
