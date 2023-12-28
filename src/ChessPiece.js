@@ -1,6 +1,7 @@
-import { Coord, textToCoord } from "./Coord";
-import * as ChessMan from "./ChessMan";
+import { Coord, textToCoord } from './Coord';
+import { ChessMan, WHITE_KING, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK, WHITE_PAWN, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK, BLACK_PAWN } from './ChessMan';
 
+/*
 export const BLACK_SIDE = "Black";
 export const WHITE_SIDE = "White";
 export const PIECE_KING = "K";
@@ -55,56 +56,81 @@ export const STARTING_PIECES = [
   { piece: BLACK_PAWN, location: textToCoord("g7")},
   { piece: BLACK_PAWN, location: textToCoord("h7")},
 ];
+*/
 
 export class ChessPiece {
   // ChessMan
   man = null;
-  // Place on the board
+  // Coord Place on the board
   location = Coord.empty;
+  // Has moved
+  hasMoved = false;
 
-  constructor(man, location) {
+  constructor(man, location, hasMoved) {
     this.man = man;
     this.location = location;
+    this.hasMoved = !!hasMoved;
   }
 
+  clone() {
+    let man = this.man.clone();
+    let location = this.location.clone();
+    return new ChessPiece(man, location, this.hasMoved);
+  }
+
+  // Take this piece. Set location to Coord.empty
   take() {
     this.location = Coord.empty;
   }
 
+  // Move this piece to the specified location
+  moveTo(newLocation) {
+    this.location = newLocation;
+    this.hasMoved = true;
+  }
+
+  isTaken() {
+    return this.location.isEmpty();
+  }
+
+  isOnBoard() {
+    return !this.location.isEmpty();
+  }
+
   static getStartingPieces() {
-    return new [
-      new ChessPiece(ChessMan.WHITE_ROOK, Coord.fromText("a1")),
-      new ChessPiece(ChessMan.WHITE_KNIGHT, Coord.fromText("b1")),
-      new ChessPiece(ChessMan.WHITE_BISHOP, Coord.fromText("c1")),
-      new ChessPiece(ChessMan.WHITE_QUEEN, Coord.fromText("d1")),
-      new ChessPiece(ChessMan.WHITE_KING, Coord.fromText("e1")),
-      new ChessPiece(ChessMan.WHITE_BISHOP, Coord.fromText("f1")),
-      new ChessPiece(ChessMan.WHITE_KNIGHT, Coord.fromText("g1")),
-      new ChessPiece(ChessMan.WHITE_ROOK, Coord.fromText("h1")),
-      new ChessPiece(ChessMan.WHITE_PAWN, Coord.fromText("a2")),
-      new ChessPiece(ChessMan.WHITE_PAWN, Coord.fromText("b2")),
-      new ChessPiece(ChessMan.WHITE_PAWN, Coord.fromText("c2")),
-      new ChessPiece(ChessMan.WHITE_PAWN, Coord.fromText("d2")),
-      new ChessPiece(ChessMan.WHITE_PAWN, Coord.fromText("e2")),
-      new ChessPiece(ChessMan.WHITE_PAWN, Coord.fromText("f2")),
-      new ChessPiece(ChessMan.WHITE_PAWN, Coord.fromText("g2")),
-      new ChessPiece(ChessMan.WHITE_PAWN, Coord.fromText("h2")),
-      new ChessPiece(ChessMan.BLACK_ROOK, Coord.fromText("a8")),
-      new ChessPiece(ChessMan.BLACK_KNIGHT, Coord.fromText("b8")),
-      new ChessPiece(ChessMan.BLACK_BISHOP, Coord.fromText("c8")),
-      new ChessPiece(ChessMan.BLACK_KING, Coord.fromText("d8")),
-      new ChessPiece(ChessMan.BLACK_QUEEN, Coord.fromText("e8")),
-      new ChessPiece(ChessMan.BLACK_BISHOP, Coord.fromText("f8")),
-      new ChessPiece(ChessMan.BLACK_KNIGHT, Coord.fromText("g8")),
-      new ChessPiece(ChessMan.BLACK_ROOK, Coord.fromText("h8")),
-      new ChessPiece(ChessMan.BLACK_PAWN, Coord.fromText("a7")),
-      new ChessPiece(ChessMan.BLACK_PAWN, Coord.fromText("b7")),
-      new ChessPiece(ChessMan.BLACK_PAWN, Coord.fromText("c7")),
-      new ChessPiece(ChessMan.BLACK_PAWN, Coord.fromText("d7")),
-      new ChessPiece(ChessMan.BLACK_PAWN, Coord.fromText("e7")),
-      new ChessPiece(ChessMan.BLACK_PAWN, Coord.fromText("f7")),
-      new ChessPiece(ChessMan.BLACK_PAWN, Coord.fromText("g7")),
-      new ChessPiece(ChessMan.BLACK_PAWN, Coord.fromText("h7"))
+    return [
+      new ChessPiece(WHITE_ROOK, Coord.fromText("a1")),
+      new ChessPiece(WHITE_KNIGHT, Coord.fromText("b1")),
+      new ChessPiece(WHITE_BISHOP, Coord.fromText("c1")),
+      new ChessPiece(WHITE_QUEEN, Coord.fromText("d1")),
+      new ChessPiece(WHITE_KING, Coord.fromText("e1")),
+      new ChessPiece(WHITE_BISHOP, Coord.fromText("f1")),
+      new ChessPiece(WHITE_KNIGHT, Coord.fromText("g1")),
+      new ChessPiece(WHITE_ROOK, Coord.fromText("h1")),
+      new ChessPiece(WHITE_PAWN, Coord.fromText("a2")),
+      new ChessPiece(WHITE_PAWN, Coord.fromText("b2")),
+      new ChessPiece(WHITE_PAWN, Coord.fromText("c2")),
+      new ChessPiece(WHITE_PAWN, Coord.fromText("d2")),
+      new ChessPiece(WHITE_PAWN, Coord.fromText("e2")),
+      new ChessPiece(WHITE_PAWN, Coord.fromText("f2")),
+      new ChessPiece(WHITE_PAWN, Coord.fromText("g2")),
+      new ChessPiece(WHITE_PAWN, Coord.fromText("h2")),
+      new ChessPiece(BLACK_ROOK, Coord.fromText("a8")),
+      new ChessPiece(BLACK_KNIGHT, Coord.fromText("b8")),
+      new ChessPiece(BLACK_BISHOP, Coord.fromText("c8")),
+      new ChessPiece(BLACK_QUEEN, Coord.fromText("d8")),
+      new ChessPiece(BLACK_KING, Coord.fromText("e8")),
+      new ChessPiece(BLACK_BISHOP, Coord.fromText("f8")),
+      new ChessPiece(BLACK_KNIGHT, Coord.fromText("g8")),
+      new ChessPiece(BLACK_ROOK, Coord.fromText("h8")),
+      new ChessPiece(BLACK_PAWN, Coord.fromText("a7")),
+      new ChessPiece(BLACK_PAWN, Coord.fromText("b7")),
+      new ChessPiece(BLACK_PAWN, Coord.fromText("c7")),
+      new ChessPiece(BLACK_PAWN, Coord.fromText("d7")),
+      new ChessPiece(BLACK_PAWN, Coord.fromText("e7")),
+      new ChessPiece(BLACK_PAWN, Coord.fromText("f7")),
+      new ChessPiece(BLACK_PAWN, Coord.fromText("g7")),
+      new ChessPiece(BLACK_PAWN, Coord.fromText("h7"))
     ];    
   }
 }

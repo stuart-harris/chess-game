@@ -1,15 +1,21 @@
 import React from 'react';
 import { Component } from 'react';
 import './App.css';
-import chessBoard from './ChessBoard'
-import { coordToText, isEqualCoord } from './Coord.js';
+import { ChessSide } from './ChessSide.js';
+import { ChessGame } from './ChessGame.js';
+import { Coord, coordToText } from './Coord.js';
 
 class App extends Component {
-  engine = chessBoard.createBoard()
-  state = this.engine.state
+  game = new ChessGame();
+  state = this.game;
 
   constructor(props) {
     super(props);
+  }
+
+  gameUpdated() {
+    this.game = this.game.clone();
+    this.setState(this.game);
   }
 
   // generate a 2 x 2 array of string to render on the board
@@ -28,39 +34,42 @@ class App extends Component {
     for(let i = 0; i < pieces.length; i++) {
       let p = pieces[i];
       var coord = p.location;
-      if (!coord) continue;
-      board[8-coord.row][coord.col-1] = p.piece;
+      if (coord.isEmpty()) continue;
+      board[8-coord.row][coord.col-1] = p.man;
     }
 
     return board;
   }
 
   onClear() {
-    this.setState(this.engine.actions.clear());
+    this.game.reset()
+    this.gameUpdated();
   }
 
   onReset() {
-    this.setState(this.engine.actions.reset());
+    this.game.reset()
+    this.gameUpdated();
   }
 
   onStart() {
-    this.setState(this.engine.actions.start());
+    this.game.start()
+    this.gameUpdated();
   }
 
   onSelectBot(id) {
-    this.setState(this.engine.actions.selectBot(id));
+//    this.setState(this.engine.actions.selectBot(id));
   }
 
   coordsToBoard(coords) {
-    return { row: 8-coords.row, col: coords.col + 1};
+    return new Coord(8-coords.row, coords.col + 1);
   }
 
   coordsToScreen(coords) {
-    return { row: 8-coords.row, col: coords.col - 1};
+    return new Coord(8-coords.row, coords.col - 1);
   }
 
   makeCoord(r, c) {
-    return {row: r, col: c};
+    return new Coord(r, c);
   }
 
   isEqualCoord(a, b) {
@@ -71,13 +80,8 @@ class App extends Component {
     var bCoords = this.coordsToBoard(this.makeCoord(r, c));
     var locn = this.makeCoord(bCoords.row, bCoords.col);
     console.log('selectPiece(' + r + ', ' + c + '): ' + coordToText(locn));
-    this.setState(this.engine.actions.selectPiece(locn));
-
-    // if (this.state.chessBot && this.state.turn === "Black") {
-    //   var botMove = this.engine.methods.chessBotMove();
-    //   var setStateFn = this.setState;
-    //   setTimeout(() => setStateFn(botMove()), 1000);
-    // } 
+    this.game.selectLocation(locn);
+    this.gameUpdated();
   }
 
   getPieceClasses(r, c, piece) {
@@ -95,11 +99,15 @@ class App extends Component {
 //    var locn = this.engine.methods.coordToText(bCoords.row, bCoords.col);
 
     if (this.state.selected) {
-      result.push(isEqualCoord(locn, this.state.selected) ? 'selected' : 'selectable');
+      result.push(locn.isEqual(this.state.selected) ? 'selected' : 'selectable');
     }
 
-    if (this.state.fromLocation === locn) {
+    if (locn.isEqual(this.state.fromLocation)) {
       result.push('from');
+    }
+
+    if (locn.isEqual(this.state.invalidLocation)) {
+      result.push('invalid');
     }
 
     return result.join(' ');
@@ -107,18 +115,29 @@ class App extends Component {
 
   render() {
     const value = this.state;
-    const board = this.generateBoard(value.pieces);
+    const board = this.generateBoard(value.board.pieces);
 
     let turnsPanel;
     if (value.turn) {
-      turnsPanel =
+      if (value.isCheckmate) {
+        turnsPanel =
+        <div>
+          <div id="panel-turns">
+            <p>Checkmate! { value.turn + " wins." }</p>
+          </div>
+          <hr/>
+        </div>
+      }
+      else {
+        turnsPanel =
         <div>
           <div id="panel-turns">
             <p>{ value.turn + " to move." }</p>
           </div>
           <hr/>
-        </div> 
+        </div>
       }
+    }
 
     const rows = board.map((row, r_index) =>
       <tr key={'row_' + r_index}>
@@ -139,10 +158,9 @@ class App extends Component {
     const whiteTaken =
     <div className="taken">
       {
-    value.pieces
-    .filter(p => p.piece.side === "White" && p.location === null)
+    value.board.getTakenPiecesOfSide(ChessSide.WHITE_SIDE)
     .map((p, i) =>
-        <span key={i} dangerouslySetInnerHTML={{__html: p.piece.text}}></span>  
+        <span key={i} dangerouslySetInnerHTML={{__html: p.man.text}}></span>  
     )
       }
       </div>;
@@ -150,36 +168,25 @@ class App extends Component {
     const blackTaken =
     <div className="taken">
       {
-    value.pieces
-    .filter(p => p.piece.side === "Black" && p.location === null)
+    value.board.getTakenPiecesOfSide(ChessSide.BLACK_SIDE)
     .map((p, i) =>
-        <span key={i} dangerouslySetInnerHTML={{__html: p.piece.text}}></span>  
+        <span key={i} dangerouslySetInnerHTML={{__html: p.man.text}}></span>  
     )
       }
       </div>;
-
-    function formatMove(move) {
-      // console.log(move);
-      if(move) return move.piece.piece +
-        coordToText(move.from) +
-        (move.taken ? "x" : " ") +
-        coordToText(move.to);
-
-      return "-";
-    }
 
     const movesPanel = value.moves.map((m, i, ms) =>
     {
       if (i % 2 == 1) return
       if (i == ms.length - 1) {
         return <div key={"m-" + i} className="row">
-          <div className="column-3">{i/2+1}. {formatMove(m)}</div>
+          <div className="column-3">{i/2+1}. {m.toString()}</div>
           <div className="column-9"></div>
         </div>
       } else {
         return <div key={"m-" + i} className="row">
-          <div className="column-3">{i/2+1}. {formatMove(m)}</div>
-          <div className="column-3">{formatMove(ms[i+1])}</div>
+          <div className="column-3">{i/2+1}. {m.toString()}</div>
+          <div className="column-3">{ms[i+1].toString()}</div>
           <div className="column-6"></div>
         </div>
       }
@@ -222,6 +229,15 @@ class App extends Component {
         </div>
       </div>
     }
+
+    let gamePanel = <div>
+      <p>is playing = {value.isPlaying ? "yes" : "no"}</p>
+      <p>is check = {value.isCheck ? "yes" : "no"}</p>
+      <p>is checkmate = {value.isCheckmate ? "yes" : "no"}</p>
+      <p>selected = {value.selected.toString()}</p>
+      <p>from location = {value.fromLocation.toString()}</p>
+      <p>turn = {value.turn}</p>
+    </div>
 
     return (
       <div className="App">
@@ -284,6 +300,7 @@ class App extends Component {
                 {chessBotPanel}
               </div>
               <div className="column-6">
+                {gamePanel}
               </div>
             </div>
           </div>

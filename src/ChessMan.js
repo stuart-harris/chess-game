@@ -1,14 +1,16 @@
-import * as ChessSide from './ChessSide.js';
-
-export const PIECE_KING = "K";
-export const PIECE_QUEEN = "Q";
-export const PIECE_BISHOP = "B";
-export const PIECE_ROOK = "R";
-export const PIECE_KNIGHT = "N";
-export const PIECE_PAWN = "P";
+import { ChessSide } from './ChessSide.js';
 
 // A chessman.  A piece that is not on the board yet.
 export class ChessMan {
+
+    static PIECE_KING = "K";
+    static PIECE_QUEEN = "Q";
+    static PIECE_BISHOP = "B";
+    static PIECE_ROOK = "R";
+    static PIECE_KNIGHT = "N";
+    static PIECE_PAWN = "P";
+    
+
     type = "";
     value = 0;
     text = "";
@@ -20,6 +22,10 @@ export class ChessMan {
         this.text = ChessMan.getText(type, side);
     }
 
+    clone() {
+        return new ChessMan(this.type, this.side);
+    }
+
     // Promote to the specified type
     promote(type) {
         this.type = type;
@@ -27,12 +33,12 @@ export class ChessMan {
 
     static getValue(type) {
         switch(type) {
-            case PIECE_KING: return 200;
-            case PIECE_QUEEN: return 9;
-            case PIECE_BISHOP: return 3;
-            case PIECE_KNIGHT: return 3;
-            case PIECE_ROOK: return 5;
-            case PIECE_PAWN: return 1;
+            case this.PIECE_KING: return 200;
+            case this.PIECE_QUEEN: return 9;
+            case this.PIECE_BISHOP: return 3;
+            case this.PIECE_KNIGHT: return 3;
+            case this.PIECE_ROOK: return 5;
+            case this.PIECE_PAWN: return 1;
         }
         return 0;
     }
@@ -40,21 +46,21 @@ export class ChessMan {
     static getText(type, side) {
         if (side === ChessSide.BLACK_SIDE) {
             switch(type) {
-                case PIECE_KING: return "&#x265A;";
-                case PIECE_QUEEN: return "&#x265B;";
-                case PIECE_BISHOP: return "&#x265D;";
-                case PIECE_KNIGHT: return "&#x265E;";
-                case PIECE_ROOK: return "&#x265C;";
-                case PIECE_PAWN: return "&#x265F;";    
+                case this.PIECE_KING: return "&#x265A;";
+                case this.PIECE_QUEEN: return "&#x265B;";
+                case this.PIECE_BISHOP: return "&#x265D;";
+                case this.PIECE_KNIGHT: return "&#x265E;";
+                case this.PIECE_ROOK: return "&#x265C;";
+                case this.PIECE_PAWN: return "&#x265F;";    
             }
         } else {
             switch(type) {
-                case PIECE_KING: return "&#x2654;";
-                case PIECE_QUEEN: return "&#x2655;";
-                case PIECE_BISHOP: return "&#x2657;";
-                case PIECE_KNIGHT: return "&#x2658;";
-                case PIECE_ROOK: return "&#x2656;";
-                case PIECE_PAWN: return "&#x2659;";    
+                case this.PIECE_KING: return "&#x2654;";
+                case this.PIECE_QUEEN: return "&#x2655;";
+                case this.PIECE_BISHOP: return "&#x2657;";
+                case this.PIECE_KNIGHT: return "&#x2658;";
+                case this.PIECE_ROOK: return "&#x2656;";
+                case this.PIECE_PAWN: return "&#x2659;";    
             }
         }
         return "";
@@ -63,15 +69,15 @@ export class ChessMan {
 
 }
 
-export const WHITE_KING = new ChessMan(PIECE_KING, ChessSide.WHITE_SIDE);
-export const WHITE_QUEEN = new ChessMan(PIECE_QUEEN, ChessSide.WHITE_SIDE);
-export const WHITE_BISHOP = new ChessMan(PIECE_BISHOP, ChessSide.WHITE_SIDE);
-export const WHITE_KNIGHT = new ChessMan(PIECE_KNIGHT, ChessSide.WHITE_SIDE);
-export const WHITE_ROOK = new ChessMan(PIECE_ROOK, ChessSide.WHITE_SIDE);
-export const WHITE_PAWN = new ChessMan(PIECE_PAWN, ChessSide.WHITE_SIDE);
-export const BLACK_KING = new ChessMan(PIECE_KING, ChessSide.BLACK_SIDE);
-export const BLACK_QUEEN = new ChessMan(PIECE_QUEEN, ChessSide.BLACK_SIDE);
-export const BLACK_BISHOP = new ChessMan(PIECE_BISHOP, ChessSide.BLACK_SIDE);
-export const BLACK_KNIGHT = new ChessMan(PIECE_KNIGHT, ChessSide.BLACK_SIDE);
-export const BLACK_ROOK = new ChessMan(PIECE_ROOK, ChessSide.BLACK_SIDE);
-export const BLACK_PAWN = new ChessMan(PIECE_PAWN, ChessSide.BLACK_SIDE);
+export const WHITE_KING = new ChessMan(ChessMan.PIECE_KING, ChessSide.WHITE_SIDE);
+export const WHITE_QUEEN = new ChessMan(ChessMan.PIECE_QUEEN, ChessSide.WHITE_SIDE);
+export const WHITE_BISHOP = new ChessMan(ChessMan.PIECE_BISHOP, ChessSide.WHITE_SIDE);
+export const WHITE_KNIGHT = new ChessMan(ChessMan.PIECE_KNIGHT, ChessSide.WHITE_SIDE);
+export const WHITE_ROOK = new ChessMan(ChessMan.PIECE_ROOK, ChessSide.WHITE_SIDE);
+export const WHITE_PAWN = new ChessMan(ChessMan.PIECE_PAWN, ChessSide.WHITE_SIDE);
+export const BLACK_KING = new ChessMan(ChessMan.PIECE_KING, ChessSide.BLACK_SIDE);
+export const BLACK_QUEEN = new ChessMan(ChessMan.PIECE_QUEEN, ChessSide.BLACK_SIDE);
+export const BLACK_BISHOP = new ChessMan(ChessMan.PIECE_BISHOP, ChessSide.BLACK_SIDE);
+export const BLACK_KNIGHT = new ChessMan(ChessMan.PIECE_KNIGHT, ChessSide.BLACK_SIDE);
+export const BLACK_ROOK = new ChessMan(ChessMan.PIECE_ROOK, ChessSide.BLACK_SIDE);
+export const BLACK_PAWN = new ChessMan(ChessMan.PIECE_PAWN, ChessSide.BLACK_SIDE);

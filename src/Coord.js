@@ -41,13 +41,27 @@ export class Coord {
         this.col = col;
     }
 
+    clone() {
+        return new Coord(this.row, this.col);
+    }
+
+    isEmpty() {
+        return this.row === 0 && this.col === 0;
+    }
+
+    isEqual(coord) {
+        return this.row === coord.row && this.col === coord.col;
+    }
+
     static fromText(text) {
         var obj = textToCoord(text);
         return new Coord(obj.row, obj.col);
     }
 
-    clone() {
-        return new Coord(this.row, this.col);
+    toString() {
+        if (this.row === 0 && this.col === 0) return "None";
+        const aVal = "a".charCodeAt(0);
+        return String.fromCharCode(aVal + this.col - 1) + (this.row).toString();    
     }
 
     move(dr, dc) {

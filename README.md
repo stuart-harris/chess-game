@@ -6,13 +6,13 @@ A chess game with a chess engine
 * <input type="checkbox" checked />  Draw a board 
 * <input type="checkbox" checked />  Draw pieces 
 * <input type="checkbox" checked />  Taken piece display 
-* <input type="checkbox" />  Show whose turn
+* <input type="checkbox" checked />  Show whose turn
 
 ## Moves
 * <input type="checkbox" checked />  Click on pieces to move 
 * <input type="checkbox" checked />  Basic piece movement (i.e. rook in straight line) 
 * <input type="checkbox" checked />  Move history 
-* <input type="checkbox" />  Correct format for move history
+* <input type="checkbox" checked />  Correct format for move history
 * <input type="checkbox" checked />  Blocking pieces restrict movement 
 * <input type="checkbox" />  Pawn takes with en passant
 * <input type="checkbox" checked />  Basic castling 
@@ -37,9 +37,9 @@ A chess game with a chess engine
 * <input type="checkbox" checked />  Chessbot v1 random moves 
 * <input type="checkbox" checked />  Make Chessbot play 
 * <input type="checkbox" checked />  Restrict king movement by threats 
-* <input type="checkbox" />  Restrict piece movement by pinning
-* <input type="checkbox" />  Identify check
-* <input type="checkbox" />  Identify checkmate
+* <input type="checkbox" checked />  Restrict piece movement by pinning
+* <input type="checkbox" checked />  Identify check
+* <input type="checkbox" checked />  Identify checkmate
 * <input type="checkbox" />  Chessbot v2 avoid threats
 * <input type="checkbox" checked />  Chessbot v3 prefer attacks 
 * <input type="checkbox" />  Chessbot v4 prefer checks

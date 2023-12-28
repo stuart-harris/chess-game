@@ -193,3 +193,16 @@ table.board tr:nth-child(even) td.from.selectable:nth-child(even),
 table.board tr:nth-child(odd) td.from.selectable:nth-child(odd) {
   background: rgb(228, 221, 91);
 }
+
+table.board td.invalid,
+table.board td.invalid:hover
+ {
+  background:#d2422f;
+}
+
+table.board tr:nth-child(even) td.piece:nth-child(even).invalid,
+table.board tr:nth-child(odd) td.piece:nth-child(odd).invalid,
+table.board tr:nth-child(even) td.selectable:nth-child(even).invalid,
+table.board tr:nth-child(odd) td.selectable:nth-child(odd).invalid  {
+	background: #dc5441;
+}
