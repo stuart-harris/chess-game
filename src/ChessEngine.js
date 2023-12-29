@@ -3,6 +3,7 @@ import { ChessSide } from './ChessSide.js';
 import { ChessMan } from './ChessMan';
 import { ChessPiece } from './ChessPiece.js';
 import { ChessBoard } from './ChessBoard.js';
+import { ChessMove } from './ChessMove.js';
 
 // Evaluate and manipulate a chess board
 export class ChessEngine {
@@ -157,9 +158,9 @@ export class ChessEngine {
         var piece = board.getPieceAtLocation(rookLocn);
         // is the rook there and not moved and the same colour?
         if (!piece ||
-            p.hasMoved ||
-            p.man.side !== king.man.side ||
-            p.man.type !== ChessPiece.PIECE_ROOK) {
+            piece.hasMoved ||
+            piece.man.side !== king.man.side ||
+            piece.man.type !== ChessMan.PIECE_ROOK) {
             return false;
         }
 
@@ -214,22 +215,22 @@ export class ChessEngine {
     calculateAvailableMovesForPiece(board, piece) {
         var moves = [];
         let pieceType = piece.man.type;
-        if (pieceType === ChessPiece.PIECE_PAWN) {
+        if (pieceType === ChessMan.PIECE_PAWN) {
             moves = this.calculateAvailableMovesForPawn(board, piece);
         }
-        if (pieceType === ChessPiece.PIECE_ROOK) {
+        if (pieceType === ChessMan.PIECE_ROOK) {
             moves = this.calculateAvailableMovesForRook(board, piece);
         }
-        if (pieceType === ChessPiece.PIECE_KNIGHT) {
+        if (pieceType === ChessMan.PIECE_KNIGHT) {
             moves = this.calculateAvailableMovesForKnight(board, piece);
         }
-        if (pieceType === ChessPiece.PIECE_BISHOP) {
+        if (pieceType === ChessMan.PIECE_BISHOP) {
             moves = this.calculateAvailableMovesForBishop(board, piece);
         }
-        if (pieceType === ChessPiece.PIECE_QUEEN) {
+        if (pieceType === ChessMan.PIECE_QUEEN) {
             moves = this.calculateAvailableMovesForQueen(board, piece);
         }
-        if (pieceType === ChessPiece.PIECE_KING) {
+        if (pieceType === ChessMan.PIECE_KING) {
             moves = this.calculateAvailableMovesForKing(board, piece);
         }
 
@@ -360,13 +361,13 @@ export class ChessEngine {
     }
     
     calculateAvailableMovesForKing(board, piece) {
-        var moves = calculateAvailableMovesForRook(board, piece, 1);
-        return moves.concat(calculateAvailableMovesForBishop(board, piece, 1));
+        var moves = this.calculateAvailableMovesForRook(board, piece, 1);
+        return moves.concat(this.calculateAvailableMovesForBishop(board, piece, 1));
     }
 
     calculateAvailableMovesForQueen(board, piece) {
-        var moves = calculateAvailableMovesForRook(board, piece);
-        return moves.concat(calculateAvailableMovesForBishop(board, piece));
+        var moves = this.calculateAvailableMovesForRook(board, piece);
+        return moves.concat(this.calculateAvailableMovesForBishop(board, piece));
     }
 
     calculateAvailableMovesForKnight(board, piece) {
@@ -392,7 +393,7 @@ export class ChessEngine {
             if(!to.isValid()) continue;
             var taken = board.getPieceAtLocation(to);
             if (taken) {
-                if (taken.piece.side !== piece.piece.side) {
+                if (taken.man.side !== piece.man.side) {
                     moves.push(new ChessMove(piece, taken, coord, to))
                 }
             } else {
