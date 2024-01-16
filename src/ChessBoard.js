@@ -1,5 +1,7 @@
+import { ChessSide } from './ChessSide.js';
 import { ChessPiece } from './ChessPiece.js';
 import { ChessMan } from './ChessMan.js';
+import { Coord } from './Coord.js';
 
 export class ChessBoard {
     pieces = [];
@@ -20,10 +22,10 @@ export class ChessBoard {
     }
 
     getBackRow(side) {
-        return side === ChessPiece.WHITE_SIDE ? 1 : 8;        
+        return side === ChessSide.WHITE_SIDE ? 1 : 8;        
     }
     getLastRow(side) {
-        return side === ChessPiece.WHITE_SIDE ? 8 : 1;        
+        return side === ChessSide.WHITE_SIDE ? 8 : 1;        
     }
 
     // get the piece at the location
@@ -61,12 +63,34 @@ export class ChessBoard {
         return this.pieces.find(p => p.man.side === side && p.man.type === ChessMan.PIECE_KING);
     }
 
-    // Move the piece at fromLocation to toLocation
+    /**
+     * Move the piece at fromLocation to toLocation
+     * TODO: The ChessGame will do the taking using Engine.getTakenPiece(...)
+     * @param {Coord} fromLocation 
+     * @param {Coord} toLocation 
+     */
     move(fromLocation, toLocation) {
         var piece = this.getPieceAtLocation(fromLocation);
 
         if (piece) {
             var taken = this.getPieceAtLocation(toLocation);
+    
+            // en-passant
+            if (piece.man.type === ChessMan.PIECE_PAWN && !taken) {
+                var isSide1 = Math.abs(fromLocation.col - toLocation.col) === 1;
+                var forwardDir = piece.man.side === ChessSide.WHITE_SIDE ? 1 : -1;
+                var rowDiff = toLocation.row - fromLocation.row;
+                var isForward1 = rowDiff === forwardDir;
+                if (isSide1 && isForward1) {
+                    var enPassantToSq = new Coord(fromLocation.row, toLocation.col);
+                    var enPassantPiece = this.getPieceAtLocation(enPassantToSq);
+                    if (enPassantPiece.man.side !== piece.man.side &&
+                        enPassantPiece.man.type === ChessMan.PIECE_PAWN) {
+                        taken = enPassantPiece;
+                    }
+                }    
+            }
+
             if (taken) {
                 taken.take();
             }

@@ -4,6 +4,7 @@ import { ChessMan } from './ChessMan';
 import { ChessPiece } from './ChessPiece.js';
 import { ChessBoard } from './ChessBoard.js';
 import { ChessMove } from './ChessMove.js';
+import { ChessMoveResult } from './ChessMoveResult.js';
 
 // Evaluate and manipulate a chess board
 export class ChessEngine {
@@ -41,6 +42,32 @@ export class ChessEngine {
     }
 
     /**
+     * Perfom the move. Assumes that canMove has returned true.
+     * @param {ChessBoard} board The chess board
+     * @param {ChessPiece} piece The piece moving 
+     * @param {Coord} from The current location of the piece
+     * @param {Coord} to The new location of the piece
+     * @returns {ChessMoveResult} The result of the move
+     */
+    performMove(board, piece, from, to) {
+        board = board.clone();
+        // TODO: Use Engine.getTakenPiece(...)
+        let taken = this.board.getPieceAtLocation(to);
+        board.move(from, to);
+        let otherSide = ChessSide.getOtherSide(piece.man.side);
+        let isCheck = this.isCheck(board, otherSide);
+        let isCheckmate = isCheck ? this.isCheckmate(board, otherSide) : false;
+        let indicator = ChessMove.getIndicator(isCheck, isCheckmate, false, false);
+        // TODO: return ChessMove from board.move() or the piece taken
+        let move = new ChessMove(piece, taken, from, to, indicator);
+        let turn = undefined;
+        if (!isCheckmate) {
+            turn = otherSide;
+        }
+        return new ChessMoveResult(board, move, turn, isCheck, isCheckmate);
+    }
+
+    /**
      * If the move was made would the side be in check?
      * @param {ChessBoard} board 
      * @param {string} side
@@ -60,16 +87,19 @@ export class ChessEngine {
      * @param {string} turn ChessSide.BLACK_SIDE or ChessSide.WHITE_SIDE 
      * @param {Coord} from 
      * @param {Coord} to 
-     * @param {bool} isThreat is being called as part of a threat check 
+     * @param {ChessMove} previousMove the last move made, is null for the first move. Required for en-passant.
+     * @param {bool} isThreatCheck is being called as part of a threat check. Required to ignore straight pawn moves.
      * @returns true if the piece can move
      */
-    canMove(board, piece, turn, from, to, isThreat) {
+    canMove(board, piece, turn, from, to, previousMove, isThreatCheck) {
         // No piece to move?
         if (!piece) return false;
         // Piece is not on the board? 
         if (!piece.isOnBoard()) return false;
         // Is not the piece side's turn
         if (piece.man.side !== turn) return false;
+        // Not a valid square to move to
+        if (!to.isValid()) return false;
 
         // What is at the location?
         let taken = board.getPieceAtLocation(to);
@@ -104,7 +134,7 @@ export class ChessEngine {
             can = this.isStraightMove(from, to) && !this.isPieceBetween(board, from, to);
         }
         if (pieceType === ChessMan.PIECE_PAWN) {
-            can = this.isPawnMove(board, from, to, piece, taken, isThreat) &&
+            can = this.isPawnMove(board, from, to, piece, taken, previousMove, isThreatCheck) &&
             !this.isPieceBetween(board, from, to);
         }
 
@@ -173,14 +203,54 @@ export class ChessEngine {
         return !blocked;
     }
 
-    isPawnMove(board, fromCoord, toCoord, piece, takenPiece, isThreat) {
-        var dir = piece.man.side === ChessSide.WHITE_SIDE ? 1 : -1;
-        var isForward1 = toCoord.row - fromCoord.row === dir;
-        var isForward2 = toCoord.row - fromCoord.row === dir * 2;
+    /**
+     * Is the move a pawn move
+     * @param {*} board 
+     * @param {*} fromCoord 
+     * @param {*} toCoord 
+     * @param {*} piece 
+     * @param {*} takenPiece 
+     * @param {bool} isThreat Are we checking if the move is a taking move, if so, don't allow moving straight
+     * @returns 
+     */
+    isPawnMove(board, fromCoord, toCoord, piece, takenPiece, previousMove, isThreat) {
+        var forwardDir = piece.man.side === ChessSide.WHITE_SIDE ? 1 : -1;
         var isSameCol = fromCoord.col === toCoord.col;
         var isSide1 = Math.abs(fromCoord.col - toCoord.col) === 1;
+        
+        if (isSameCol) {
+            var inFrontSq = new Coord(fromCoord.row + forwardDir, fromCoord.col);
+            if(!!takenPiece || board.isPieceAtLocation(inFrontSq)) {
+                // Cannot move forward, there is a piece in the way
+                return false;
+            }
+        }
+
+        // isEnPassant()
+        var rowDiff = toCoord.row - fromCoord.row;
+        var isForward1 = rowDiff === forwardDir;
+        var isForward2 = rowDiff === forwardDir * 2;
+
+        // is the move to the side and 1 ahead and is there nothing there?
+        if (isSide1 && !takenPiece && isForward1 && !!previousMove) {
+            // is there a pawn 1 ahead of the "to" location that has just moved 2 places?
+            // 
+            var otherPawnToSq = new Coord(fromCoord.row, toCoord.col);
+            //var enPassantFromSq = new Coord(fromCoord.row + forwardDir * 2, toCoord.col);
+            var otherPawnPiece = board.getPieceAtLocation(otherPawnToSq);
+            var otherSide = ChessSide.getOtherSide(piece.man.side);
+            if (otherPawnPiece &&
+                otherPawnPiece.man.side === otherSide &&
+                otherPawnPiece.man.type === ChessMan.PIECE_PAWN &&
+                otherPawnPiece.isFirstMove() &&
+                otherPawnToSq.isEqual(previousMove.to)) {
+                    // en-passant
+                    return true;
+                }
+        }
+
         return (isSameCol && !takenPiece && (isForward1 || (!piece.moved && isForward2)) && !isThreat) ||
-            (isSide1 && takenPiece && takenPiece.man.side !== piece.man.side  && isForward1);
+            (isSide1 && takenPiece && takenPiece.man.side !== piece.man.side && isForward1);
     }
 
      // Is there a piece on the board between the two locations?
@@ -200,7 +270,7 @@ export class ChessEngine {
     }
 
     /**
-     * Is this square threatened?
+     * Is this square threatened? Used to test if the king is in or would be in check.
      * @param board The board
      * @param side The side who is threatened
      * @param square The square potentially threatened
@@ -208,7 +278,7 @@ export class ChessEngine {
     isThreatened(board, side, square) {
         var otherSide = ChessSide.getOtherSide(side);
         var sidePieces = board.getPiecesOfSide(otherSide);
-        return sidePieces.some(p => this.canMove(board, p, otherSide, p.location, square, true));
+        return sidePieces.some(p => this.canMove(board, p, otherSide, p.location, square, null, true));
     }
 
     // *** Available moves ***
@@ -407,8 +477,8 @@ export class ChessEngine {
     calculateAvailableMovesForPawn(board, piece) {
         var moves = [];
         let coord = piece.location;
-        var dir = piece.man.side === ChessPiece.WHITE_SIDE ? 1 : -1;
-        var to = new Coord(coord.row + dir, coord.col);
+        var forwardDir = piece.man.side === ChessPiece.WHITE_SIDE ? 1 : -1;
+        var to = new Coord(coord.row + forwardDir, coord.col);
 
         if (to.isValid()){
             var taken = board.getPieceAtLocation(to);
@@ -417,23 +487,25 @@ export class ChessEngine {
             }
         }
 
-        to = new Coord(coord.row + dir, coord.col - 1);
+        to = new Coord(coord.row + forwardDir, coord.col - 1);
         if (to.isValid()) {
             var taken = board.getPieceAtLocation(to);
             if (!!taken && taken.man.side !== piece.man.side) {
                 moves.push(new ChessMove(piece, taken, coord, to));
             }
+            
+            // TODO: en passant
         }
 
-        to = new Coord(coord.row + dir, coord.col + 1);
+        to = new Coord(coord.row + forwardDir, coord.col + 1);
         if (to.isValid()) {
             var taken = board.getPieceAtLocation(to);
             if (!!taken && taken.man.side !== piece.man.side) {
                 moves.push(new ChessMove(piece, taken, coord, to));
             }
-        }
 
-        // TODO: en passant
+            // TODO: en passant
+        }
 
         return moves;
     }

@@ -29,6 +29,8 @@ export class ChessMan {
     // Promote to the specified type
     promote(type) {
         this.type = type;
+        this.value = ChessMan.getValue(this.type);
+        this.text = ChessMan.getText(this.type, this.side);
     }
 
     static getValue(type) {

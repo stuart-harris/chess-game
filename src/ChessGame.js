@@ -115,8 +115,9 @@ export class ChessGame {
 
     attemptMove(from, to) {
         let piece = this.board.getPieceAtLocation(from);
+        let previousMove = this.getPreviousMove();
         // Attempt to move
-        if (this.engine.canMove(this.board, piece, this.turn, from, to)) {
+        if (this.engine.canMove(this.board, piece, this.turn, from, to, previousMove, false)) {
             this.performMove(piece, from, to);
             this.fromLocation = from;
             this.selected = Coord.empty;
@@ -130,8 +131,14 @@ export class ChessGame {
         this.moves.push(new ChessMove(piece, taken, from, to, indicator));
     }
 
+    getPreviousMove() {
+        return this.moves.length ? this.moves[this.moves.length - 1] : null; 
+    }
+
     performMove(piece, from, to) {
         let board = this.board.clone();
+        // TODO: Use Engine.performMove(...) which returns a ChessMoveResult: new board and a move, isCheck and isCheckmate
+        // TODO: Use Engine.getTakenPiece(...)
         let taken = this.board.getPieceAtLocation(to);
         board.move(from, to);
         let otherSide = ChessSide.getOtherSide(this.turn);
